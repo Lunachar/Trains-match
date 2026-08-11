@@ -86,7 +86,8 @@ namespace SortingStation.EditorTools
             int expectedCount = timeline ? 3 : ExpectedImageCount;
             bool complete = Directory.Exists(output) && Directory.EnumerateFiles(output, "*.png").Count() >= expectedCount;
             DateTime started = ReadStartedTime();
-            bool timedOut = DateTime.UtcNow - started > Timeout;
+            TimeSpan timeout = timeline ? TimeSpan.FromMinutes(3) : Timeout;
+            bool timedOut = DateTime.UtcNow - started > timeout;
 
             if (complete && !timeline && !ValidateCaptures(output, out string validationError))
             {
