@@ -1,0 +1,321 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d2bbd405488b6469f1dcd79da66cd9, type: 3}
+  m_Name: CabSceneryCatalog
+  m_EditorClassIdentifier: 
+  cabOverlay: {fileID: 21300000, guid: 38285435a3aba814b8a93bdceef42708, type: 3}
+  keychain: {fileID: 21300000, guid: 3ab3003163f79f54ab2707bb695e1c40, type: 3}
+  headlightMask: {fileID: 0}
+  cabinLightMask: {fileID: 0}
+  routeSegments:
+  - {fileID: 11400000, guid: e0cdf16aedf4b484d8bb05c0eaaa2232, type: 2}
+  - {fileID: 11400000, guid: fd49a90e2ac23c94c844c7ce69d482d3, type: 2}
+  - {fileID: 11400000, guid: ee54c8fefb702e947a1f6153f8303850, type: 2}
+  - {fileID: 11400000, guid: d5ee3d2cab7aa53429aa7fdc0213f67e, type: 2}
+  - {fileID: 11400000, guid: fcf2341210736ff49aaed65dde512d20, type: 2}
+  - {fileID: 11400000, guid: da81794aa919356459f02e74e6d199af, type: 2}
+  - {fileID: 11400000, guid: d7ec2e4f64c1b0a43814cf881994f5fe, type: 2}
+  scenery:
+  - id: tree_deciduous
+    sprite: {fileID: 6944233165910682514, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
+    layer: 2
+    segments: 00000000010000000200000004000000
+    baseSize: {x: 360, y: 300}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.18
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: tree_pine
+    sprite: {fileID: 6983589859096036457, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
+    layer: 1
+    segments: 0100000006000000
+    baseSize: {x: 410, y: 340}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.92
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: bush_fence
+    sprite: {fileID: 2943404031390888131, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
+    layer: 2
+    segments: 000000000200000004000000
+    baseSize: {x: 360, y: 250}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.12
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: telegraph_pole
+    sprite: {fileID: 5379843555606107083, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
+    layer: 2
+    segments: 040000000200000003000000
+    baseSize: {x: 210, y: 360}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.2
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: village_houses
+    sprite: {fileID: -4124212852815044677, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
+    layer: 1
+    segments: 02000000
+    baseSize: {x: 470, y: 310}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.88
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: barn
+    sprite: {fileID: -6847935165863209887, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
+    layer: 1
+    segments: 0200000000000000
+    baseSize: {x: 430, y: 320}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.9
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: town_block
+    sprite: {fileID: -881029689960839251, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
+    layer: 0
+    segments: 03000000
+    baseSize: {x: 560, y: 330}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.58
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: cars
+    sprite: {fileID: -2373160362985190845, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
+    layer: 2
+    segments: 040000000300000002000000
+    baseSize: {x: 300, y: 190}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.35
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: cows
+    sprite: {fileID: -3641001793436527819, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
+    layer: 1
+    segments: 00000000
+    baseSize: {x: 360, y: 260}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.85
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: sheep
+    sprite: {fileID: 3053566679240924513, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
+    layer: 1
+    segments: 00000000
+    baseSize: {x: 360, y: 250}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.85
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: river_bridge
+    sprite: {fileID: 1654385442492048536, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
+    layer: 2
+    segments: 05000000
+    baseSize: {x: 620, y: 380}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.05
+    centered: 1
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: lake
+    sprite: {fileID: -5051115896102233841, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
+    layer: 1
+    segments: 05000000
+    baseSize: {x: 560, y: 300}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.72
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: mountain_ridge
+    sprite: {fileID: -8247361158256445083, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
+    layer: 0
+    segments: 06000000
+    baseSize: {x: 760, y: 340}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.42
+    centered: 1
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: tunnel_portal
+    sprite: {fileID: -897802387918450154, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
+    layer: 1
+    segments: 06000000
+    baseSize: {x: 700, y: 520}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.72
+    centered: 1
+    mirrorAllowed: 0
+    poolSpawn: 0
+  - id: stone_bridge
+    sprite: {fileID: -2428600594186682869, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
+    layer: 2
+    segments: 0500000006000000
+    baseSize: {x: 620, y: 380}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.05
+    centered: 1
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: tunnel_lamps
+    sprite: {fileID: 4878471364012812451, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
+    layer: 2
+    segments: 06000000
+    baseSize: {x: 720, y: 300}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1
+    centered: 1
+    mirrorAllowed: 0
+    poolSpawn: 0
+  - id: tractor
+    sprite: {fileID: 1534292470153311352, guid: 48729da13374b684ba07a63241005205, type: 3}
+    layer: 2
+    segments: 0000000002000000
+    baseSize: {x: 410, y: 290}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.1
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: horses
+    sprite: {fileID: -7327042303958652010, guid: 48729da13374b684ba07a63241005205, type: 3}
+    layer: 1
+    segments: 00000000
+    baseSize: {x: 410, y: 290}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.84
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: hay_bales
+    sprite: {fileID: 6661796321754428580, guid: 48729da13374b684ba07a63241005205, type: 3}
+    layer: 2
+    segments: 0000000002000000
+    baseSize: {x: 430, y: 300}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.05
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: windmill
+    sprite: {fileID: -5521130737796374665, guid: 48729da13374b684ba07a63241005205, type: 3}
+    layer: 1
+    segments: 0000000002000000
+    baseSize: {x: 440, y: 370}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.66
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: rural_station
+    sprite: {fileID: 5820737842932475405, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    layer: 1
+    segments: 0200000003000000
+    baseSize: {x: 520, y: 350}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.8
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: level_crossing
+    sprite: {fileID: -8234472447570065011, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    layer: 2
+    segments: 040000000200000003000000
+    baseSize: {x: 560, y: 330}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.15
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: railway_signal
+    sprite: {fileID: 3204747379480863313, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    layer: 2
+    segments: 040000000200000003000000
+    baseSize: {x: 220, y: 380}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 1.2
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: water_tower
+    sprite: {fileID: 87598699333754140, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    layer: 1
+    segments: 0200000003000000
+    baseSize: {x: 460, y: 390}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.78
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: birch_grove
+    sprite: {fileID: -6217364339280654760, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    layer: 1
+    segments: 0100000000000000
+    baseSize: {x: 520, y: 360}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.88
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: sunflower_field
+    sprite: {fileID: -8242211579933634875, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    layer: 1
+    segments: 0000000002000000
+    baseSize: {x: 540, y: 260}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.78
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: waterfall
+    sprite: {fileID: 4392170440827130783, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    layer: 1
+    segments: 0500000006000000
+    baseSize: {x: 540, y: 430}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.6
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  - id: castle_ruins
+    sprite: {fileID: -1039665174665886631, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    layer: 0
+    segments: 000000000100000006000000
+    baseSize: {x: 580, y: 420}
+    scaleRange: {x: 0.88, y: 1.14}
+    speedMultiplier: 0.46
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+  poolSize: 56
+  seasonalGrounds:
+  - {fileID: 687447721551520008, guid: d88c41a2216004f4abc2b09715265219, type: 3}
+  - {fileID: -4905457143732390349, guid: d88c41a2216004f4abc2b09715265219, type: 3}
+  - {fileID: -5559667657986882776, guid: d88c41a2216004f4abc2b09715265219, type: 3}
+  - {fileID: 7685737032185354566, guid: d88c41a2216004f4abc2b09715265219, type: 3}
+  forestBand: {fileID: 8732292555042372730, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
+  shrubBand: {fileID: 6639860878872309664, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
+  distantBackdrop: {fileID: -9111833856690225530, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
+  townBand: {fileID: 5125469599591842924, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
+  forestDensityMultiplier: 1.85
+  townDensityMultiplier: 2.15
+  seasonCycleDistance: 900
+  weatherOverlayAlpha: 0.16

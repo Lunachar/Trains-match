@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17bc71df325fd174abf1f02d36ef14c1, type: 3}
+  m_Name: AppSettings
+  m_EditorClassIdentifier: 
+  productName: "\u0421\u043E\u0440\u0442\u0438\u0440\u043E\u0432\u043E\u0447\u043D\u0430\u044F
+    \u0441\u0442\u0430\u043D\u0446\u0438\u044F"
+  androidPackageName: com.lunacharprod.sortingstation
+  referenceResolution: {x: 1920, y: 1200}
+  minimumTargetSize: 120
+  targetGap: 24
+  inputCooldown: 0.18
+  parentHoldSeconds: 2
+  wagonTravelSeconds: 1.1
+  feedbackSeconds: 0.65
+  pressedScale: 0.96
+  speechLanguage: ru_RU
+  speechRate: 0.9
+  speechPitch: 1
+  skyColor: {r: 0.5568628, g: 0.83137256, b: 0.95686275, a: 1}
+  groundColor: {r: 0.36078432, g: 0.56078434, b: 0.34901962, a: 1}
+  panelColor: {r: 0.08627451, g: 0.14901961, b: 0.19215687, a: 0.96}
+  panelAltColor: {r: 0.14901961, g: 0.23137255, b: 0.28627452, a: 0.96}
+  surfaceColor: {r: 0.2, g: 0.3019608, b: 0.3529412, a: 0.96}
+  primaryColor: {r: 0.40392157, g: 0.78039217, b: 0.9490196, a: 1}
+  accentColor: {r: 1, g: 0.83137256, b: 0.36862746, a: 1}
+  focusColor: {r: 1, g: 0.83137256, b: 0.36862746, a: 1}
+  selectedColor: {r: 0.34509805, g: 0.81960785, b: 0.5764706, a: 1}
+  textColor: {r: 0.96862745, g: 0.9843137, b: 0.99215686, a: 1}
+  mutedTextColor: {r: 0.7921569, g: 0.8509804, b: 0.8784314, a: 1}
+  textOnBrightColor: {r: 0.0627451, g: 0.13725491, b: 0.1764706, a: 1}
+  errorColor: {r: 0.9490196, g: 0.4862745, b: 0.41960785, a: 1}
+  brakeColor: {r: 0.9490196, g: 0.4862745, b: 0.41960785, a: 1}
+  displayFontSize: 64
+  titleFontSize: 48
+  controlFontSize: 32
+  statusFontSize: 26
+  captionFontSize: 22

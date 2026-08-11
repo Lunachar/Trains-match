@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 752a0296b986da04fa9358ede1b78e15, type: 3}
+  m_Name: road
+  m_EditorClassIdentifier: 
+  displayName: "\u0414\u043E\u0440\u043E\u0433\u0430"
+  type: 4
+  length: 145
+  weight: 0.92
+  minimumGapSegments: 1
+  sceneryDensity: 0.95
+  ambientTint: {r: 0.9529412, g: 0.92156863, b: 0.84705883, a: 1}
+  sideRoad: 1
+  rare: 0

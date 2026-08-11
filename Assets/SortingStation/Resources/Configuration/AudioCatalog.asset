@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef0287315528c8d44bc3b167cb56d0b2, type: 3}
+  m_Name: AudioCatalog
+  m_EditorClassIdentifier: 
+  menuMusic: {fileID: 8300000, guid: 80451219674d200489a4a2a9d3dedb92, type: 3}
+  cabRadioMusic: {fileID: 8300000, guid: 80451219674d200489a4a2a9d3dedb92, type: 3}
+  cabRadioPlaylist:
+  - {fileID: 8300000, guid: 80451219674d200489a4a2a9d3dedb92, type: 3}
+  railLoop: {fileID: 8300000, guid: ec7d01d74e2f4b64c8953599291cfda5, type: 3}
+  events:
+  - cue: 0
+    volume: 0.34
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 1
+    volume: 0.16
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 2
+    volume: 0.55
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 3
+    volume: 0.34
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 11
+    volume: 0.62
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 6
+    volume: 0.86
+    pitchMin: 0.96
+    pitchMax: 1.04
+    cooldownSeconds: 0.3
+    fallback: {fileID: 8300000, guid: 931c1268d3f2150448ebbca04dd2f411, type: 3}
+    variants:
+    - {fileID: 8300000, guid: 931c1268d3f2150448ebbca04dd2f411, type: 3}
+    - {fileID: 8300000, guid: 61657cde47c6eb9429be663fe8cb5a61, type: 3}
+    - {fileID: 8300000, guid: 28cf6ffc0664f6143a836269db0f2d83, type: 3}
+    - {fileID: 8300000, guid: eb4912f393ec8a0469595014392fc429, type: 3}
+    - {fileID: 8300000, guid: 23657202f4b71a546a4832aa25436b5d, type: 3}
+  - cue: 5
+    volume: 0.62
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 8300000, guid: 9ac412279105b31469d5b1962599a1be, type: 3}
+    variants:
+    - {fileID: 8300000, guid: 9ac412279105b31469d5b1962599a1be, type: 3}
+  - cue: 4
+    volume: 0.62
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 8300000, guid: 9ac412279105b31469d5b1962599a1be, type: 3}
+    variants:
+    - {fileID: 8300000, guid: 9ac412279105b31469d5b1962599a1be, type: 3}
+  - cue: 9
+    volume: 0.46
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 8300000, guid: 9ac412279105b31469d5b1962599a1be, type: 3}
+    variants:
+    - {fileID: 8300000, guid: 9ac412279105b31469d5b1962599a1be, type: 3}
+  - cue: 10
+    volume: 0.34
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 7
+    volume: 0.58
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 8
+    volume: 0.46
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
