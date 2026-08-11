@@ -25,6 +25,12 @@ namespace SortingStation
             Debug.Log("Smoke output: " + outputDirectory);
             Screen.SetResolution(1600, 1000, FullScreenMode.Windowed);
 
+            if (Array.Exists(Environment.GetCommandLineArgs(), arg => string.Equals(arg, "-rideTimeline", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return CaptureRideTimeline();
+                yield break;
+            }
+
             yield return WaitForScene(SceneNames.MainMenu);
             yield return Capture("01-main-menu.png");
             Debug.Log("Smoke captured main menu.");
@@ -51,6 +57,25 @@ namespace SortingStation
             Debug.Log("Smoke captured cab ride.");
 
             Debug.Log("SMOKE_CAPTURE_COMPLETE=" + outputDirectory);
+            yield return new WaitForSecondsRealtime(0.3f);
+            Application.Quit();
+        }
+
+        private IEnumerator CaptureRideTimeline()
+        {
+            yield return WaitForScene(SceneNames.MainMenu);
+            AppServices.Instance.Session.Select(GameMode.CabRide, 2);
+            SceneManager.LoadScene(SceneNames.CabRide);
+            yield return WaitForScene(SceneNames.CabRide);
+            CabRideController cab = FindObjectOfType<CabRideController>();
+            if (cab != null) cab.ConfigureSmokeDemo(false);
+            yield return new WaitForSecondsRealtime(2.2f);
+            yield return Capture("01-ride-00m.png");
+            yield return new WaitForSecondsRealtime(60f);
+            yield return Capture("02-ride-01m.png");
+            yield return new WaitForSecondsRealtime(60f);
+            yield return Capture("03-ride-02m.png");
+            Debug.Log("RIDE_TIMELINE_COMPLETE=" + outputDirectory);
             yield return new WaitForSecondsRealtime(0.3f);
             Application.Quit();
         }

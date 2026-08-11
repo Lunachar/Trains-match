@@ -27,6 +27,8 @@ namespace SortingStation
         private RectTransform radioPlaylist;
         private AccessibleButton radioPowerButton;
         private AccessibleButton radioPlaylistButton;
+        private RectTransform radioPlayGlyph;
+        private RectTransform radioPauseGlyph;
         private bool playlistOpen;
         private TextMeshProUGUI routeDisplay;
         private Image headlightGlow;
@@ -450,14 +452,19 @@ namespace SortingStation
             radioTrackTitle.enableWordWrapping = false;
             radioTrackTitle.overflowMode = TextOverflowModes.Ellipsis;
             UiFactory.SetRect(radioTrackTitle.rectTransform, new Vector2(0.08f, 0.57f), new Vector2(0.92f, 0.76f), Vector2.zero, Vector2.zero);
-            radioTime = UiFactory.Label("TrackTime", player, "00:00  ━━━━━  00:00", theme.CaptionFontSize,
+            radioTime = UiFactory.Label("TrackTime", player, "00:00 - 00:00", theme.CaptionFontSize,
                 new Color(0.47f, 0.84f, 0.61f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
             UiFactory.SetRect(radioTime.rectTransform, new Vector2(0.05f, 0.43f), new Vector2(0.95f, 0.58f), Vector2.zero, Vector2.zero);
 
-            radioPowerButton = RadioButton("RadioPower", player, "▶", new Vector2(0.38f, 0.12f), new Vector2(0.62f, 0.39f), ToggleRadio, "Радио: включить или поставить на паузу");
-            RadioButton("RadioPrevious", player, "◀", new Vector2(0.08f, 0.12f), new Vector2(0.31f, 0.39f), PreviousRadioTrack, "Предыдущий трек");
-            RadioButton("RadioNext", player, "▶▶", new Vector2(0.69f, 0.12f), new Vector2(0.92f, 0.39f), NextRadioTrack, "Следующий трек");
-            radioPlaylistButton = RadioButton("RadioPlaylist", player, "≡ треки", new Vector2(0.05f, -0.15f), new Vector2(0.95f, 0.06f), TogglePlaylist, "Открыть список треков");
+            radioPowerButton = RadioButton("RadioPower", player, string.Empty, new Vector2(0.38f, 0.12f), new Vector2(0.62f, 0.39f), ToggleRadio, "Радио: включить или поставить на паузу");
+            radioPlayGlyph = CreateRadioGlyph(radioPowerButton, "play");
+            radioPauseGlyph = CreateRadioGlyph(radioPowerButton, "pause");
+            AccessibleButton previous = RadioButton("RadioPrevious", player, string.Empty, new Vector2(0.08f, 0.12f), new Vector2(0.31f, 0.39f), PreviousRadioTrack, "Предыдущий трек");
+            CreateRadioGlyph(previous, "previous");
+            AccessibleButton next = RadioButton("RadioNext", player, string.Empty, new Vector2(0.69f, 0.12f), new Vector2(0.92f, 0.39f), NextRadioTrack, "Следующий трек");
+            CreateRadioGlyph(next, "next");
+            radioPlaylistButton = RadioButton("RadioPlaylist", player, string.Empty, new Vector2(0.05f, -0.15f), new Vector2(0.95f, 0.06f), TogglePlaylist, "Открыть список треков");
+            CreateRadioGlyph(radioPlaylistButton, "playlist");
 
             radioPlaylist = UiFactory.Panel("RadioPlaylist", cabInterior, new Color(0.02f, 0.04f, 0.055f, 0.96f), UiFactory.RoundedSprite());
             UiFactory.SetRect(radioPlaylist, new Vector2(0.018f, 0.075f), new Vector2(0.265f, 0.27f), Vector2.zero, Vector2.zero);
@@ -473,7 +480,52 @@ namespace SortingStation
                 new Color(0.34f, 0.74f, 0.35f, 1f), action, services.Settings.CaptionFontSize);
             UiFactory.SetRect(button.RectTransform, min, max, Vector2.zero, Vector2.zero);
             button.SetAccessibleName(accessibleName);
+            button.Label.gameObject.SetActive(false);
             return button;
+        }
+
+        private RectTransform CreateRadioGlyph(AccessibleButton button, string kind)
+        {
+            RectTransform root = new GameObject("Glyph_" + kind, typeof(RectTransform)).GetComponent<RectTransform>();
+            root.SetParent(button.transform, false);
+            UiFactory.Stretch(root);
+            Color color = new Color(0.75f, 1f, 0.70f, 1f);
+            switch (kind)
+            {
+                case "pause":
+                    GlyphStroke(root, color, new Vector2(0.41f, 0.5f), 8f, 30f, 0f);
+                    GlyphStroke(root, color, new Vector2(0.59f, 0.5f), 8f, 30f, 0f);
+                    break;
+                case "previous":
+                    GlyphStroke(root, color, new Vector2(0.35f, 0.5f), 7f, 34f, 0f);
+                    GlyphStroke(root, color, new Vector2(0.60f, 0.62f), 7f, 30f, 45f);
+                    GlyphStroke(root, color, new Vector2(0.60f, 0.38f), 7f, 30f, -45f);
+                    break;
+                case "next":
+                    GlyphStroke(root, color, new Vector2(0.65f, 0.5f), 7f, 34f, 0f);
+                    GlyphStroke(root, color, new Vector2(0.40f, 0.62f), 7f, 30f, -45f);
+                    GlyphStroke(root, color, new Vector2(0.40f, 0.38f), 7f, 30f, 45f);
+                    break;
+                case "playlist":
+                    for (int i = 0; i < 3; i++) GlyphStroke(root, color, new Vector2(0.5f, 0.30f + i * 0.20f), 64f, 6f, 90f);
+                    break;
+                default:
+                    GlyphStroke(root, color, new Vector2(0.43f, 0.62f), 7f, 30f, 45f);
+                    GlyphStroke(root, color, new Vector2(0.43f, 0.38f), 7f, 30f, -45f);
+                    GlyphStroke(root, color, new Vector2(0.63f, 0.5f), 7f, 31f, 0f);
+                    break;
+            }
+            return root;
+        }
+
+        private static void GlyphStroke(Transform parent, Color color, Vector2 center, float width, float height, float angle)
+        {
+            RectTransform stroke = UiFactory.Panel("Stroke", parent, color, UiFactory.RoundedSprite());
+            stroke.anchorMin = stroke.anchorMax = center;
+            stroke.pivot = new Vector2(0.5f, 0.5f);
+            stroke.sizeDelta = new Vector2(width, height);
+            stroke.localRotation = Quaternion.Euler(0f, 0f, angle);
+            stroke.GetComponent<Image>().raycastTarget = false;
         }
 
         private void BuildPlaylistEntries()
@@ -542,8 +594,9 @@ namespace SortingStation
             radioTrackTitle.text = playing ? services.Audio.RadioTrackName : "Радио выключено";
             float time = services.Audio.RadioTrackTime;
             float duration = services.Audio.RadioTrackLength;
-            radioTime.text = string.Format("{0:00}:{1:00}  ━━━━━  {2:00}:{3:00}", Mathf.FloorToInt(time / 60f), Mathf.FloorToInt(time % 60f), Mathf.FloorToInt(duration / 60f), Mathf.FloorToInt(duration % 60f));
-            if (radioPowerButton != null) radioPowerButton.SetLabel(playing ? "Ⅱ" : "▶");
+            radioTime.text = string.Format("{0:00}:{1:00} - {2:00}:{3:00}", Mathf.FloorToInt(time / 60f), Mathf.FloorToInt(time % 60f), Mathf.FloorToInt(duration / 60f), Mathf.FloorToInt(duration % 60f));
+            if (radioPlayGlyph != null) radioPlayGlyph.gameObject.SetActive(!playing);
+            if (radioPauseGlyph != null) radioPauseGlyph.gameObject.SetActive(playing);
             if (radioDisplay != null) radioDisplay.text = playing ? "Радио: " + services.Audio.RadioTrackName : "Радио выключено";
         }
 

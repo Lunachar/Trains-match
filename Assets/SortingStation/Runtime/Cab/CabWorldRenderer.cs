@@ -270,7 +270,7 @@ namespace SortingStation
         {
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(viewport);
-            trackBed = UiFactory.Panel("TrackBed", viewport, new Color(0.10f, 0.13f, 0.12f, 0.76f));
+            trackBed = UiFactory.Panel("TrackBed", viewport, new Color(0.10f, 0.13f, 0.12f, 0f));
             UiFactory.SetRect(trackBed, new Vector2(0.27f, -0.04f), new Vector2(0.73f, ride.Horizon + 0.01f), Vector2.zero, Vector2.zero);
             trackBed.GetComponent<Image>().raycastTarget = false;
             leftRail = CreateLine("LeftRail", new Color(0.17f, 0.19f, 0.20f, 1f));
