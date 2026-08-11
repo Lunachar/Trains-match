@@ -30,6 +30,11 @@ namespace SortingStation
                 yield return CaptureRideTimeline();
                 yield break;
             }
+            if (Array.Exists(Environment.GetCommandLineArgs(), arg => string.Equals(arg, "-departurePreview", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return CaptureDeparturePreview();
+                yield break;
+            }
 
             yield return WaitForScene(SceneNames.MainMenu);
             yield return Capture("01-main-menu.png");
@@ -77,6 +82,19 @@ namespace SortingStation
             yield return Capture("03-ride-02m.png");
             Debug.Log("RIDE_TIMELINE_COMPLETE=" + outputDirectory);
             yield return new WaitForSecondsRealtime(0.3f);
+            Application.Quit();
+        }
+
+        private IEnumerator CaptureDeparturePreview()
+        {
+            yield return WaitForScene(SceneNames.MainMenu);
+            AppServices.Instance.Session.Select(GameMode.CabRide, 2);
+            SceneManager.LoadScene(SceneNames.CabRide);
+            yield return WaitForScene(SceneNames.CabRide);
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return Capture("departure-ready.png", 1600, 1000);
+            Debug.Log("DEPARTURE_PREVIEW_COMPLETE=" + outputDirectory);
+            yield return new WaitForSecondsRealtime(0.2f);
             Application.Quit();
         }
 

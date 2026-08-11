@@ -216,7 +216,7 @@ namespace SortingStation
 
         private Image CreateBackdrop(string name, Sprite sprite, Vector2 min, Vector2 max, Color color)
         {
-            Image image = UiFactory.Image(name, viewport, sprite, color, false);
+            Image image = UiFactory.Image(name, viewport, sprite, sprite != null ? color : Color.clear, false);
             UiFactory.SetRect(image.rectTransform, min, max, Vector2.zero, Vector2.zero);
             image.raycastTarget = false;
             return image;
@@ -448,15 +448,20 @@ namespace SortingStation
         private void Spawn(SceneryInstance instance, float depth)
         {
             CabSceneryDefinition definition = ChooseDefinition();
-            if (definition == null) return;
+            if (definition == null || definition.sprite == null)
+            {
+                instance.active = false;
+                instance.rect.gameObject.SetActive(false);
+                return;
+            }
             instance.definition = definition;
             instance.depth = Mathf.Clamp01(depth);
             instance.side = definition.centered ? 0f : (random.NextDouble() < 0.5d ? -1f : 1f) * Mathf.Lerp(0.82f, 1.12f, (float)random.NextDouble());
             instance.sizeScale = Mathf.Lerp(definition.scaleRange.x, definition.scaleRange.y, (float)random.NextDouble());
             instance.active = true;
             instance.image.sprite = definition.sprite;
-            instance.image.color = definition.sprite != null ? Color.white : FallbackColor(definition.layer);
-            instance.image.preserveAspect = definition.sprite != null;
+            instance.image.color = Color.white;
+            instance.image.preserveAspect = true;
             instance.rect.SetParent(LayerFor(definition.layer), false);
             instance.rect.localScale = new Vector3(definition.mirrorAllowed && random.NextDouble() < 0.5d ? -1f : 1f, 1f, 1f);
             instance.rect.SetAsFirstSibling();
@@ -472,13 +477,13 @@ namespace SortingStation
             int eligible = 0;
             for (int i = 0; i < entries.Length; i++)
             {
-                if (entries[i] != null && entries[i].poolSpawn && entries[i].Supports(type)) eligible++;
+                if (entries[i] != null && entries[i].sprite != null && entries[i].poolSpawn && entries[i].Supports(type)) eligible++;
             }
-            if (eligible == 0) return entries[fallbackSceneryIndex++ % entries.Length];
+            if (eligible == 0) return null;
             int pick = random.Next(eligible);
             for (int i = 0; i < entries.Length; i++)
             {
-                if (entries[i] == null || !entries[i].poolSpawn || !entries[i].Supports(type)) continue;
+                if (entries[i] == null || entries[i].sprite == null || !entries[i].poolSpawn || !entries[i].Supports(type)) continue;
                 if (pick-- == 0) return entries[i];
             }
             return entries[0];

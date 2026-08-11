@@ -16,6 +16,11 @@ MonoBehaviour:
   keychain: {fileID: 21300000, guid: 3ab3003163f79f54ab2707bb695e1c40, type: 3}
   headlightMask: {fileID: 0}
   cabinLightMask: {fileID: 0}
+  radioPlayerSkin: {fileID: 21300000, guid: bbb7f817e005c524798e9f0b219ad293, type: 3}
+  radioPrevious: {fileID: 0}
+  radioPlay: {fileID: 0}
+  radioNext: {fileID: 0}
+  radioPlaylist: {fileID: 0}
   routeSegments:
   - {fileID: 11400000, guid: e0cdf16aedf4b484d8bb05c0eaaa2232, type: 2}
   - {fileID: 11400000, guid: fd49a90e2ac23c94c844c7ce69d482d3, type: 2}

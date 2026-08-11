@@ -457,9 +457,14 @@ namespace SortingStation
         private void BuildRadioPlayer()
         {
             AppSettings theme = services.Settings;
-            RectTransform player = UiFactory.Panel("RetroRadioPlayer", cabInterior, new Color(0.025f, 0.055f, 0.07f, 0.94f), UiFactory.RoundedSprite());
+            Sprite playerSkin = services.CabScenery != null ? services.CabScenery.RadioPlayerSkin : null;
+            RectTransform player = UiFactory.Panel("RetroRadioPlayer", cabInterior,
+                playerSkin != null ? Color.white : new Color(0.025f, 0.055f, 0.07f, 0.94f),
+                playerSkin != null ? playerSkin : UiFactory.RoundedSprite());
             UiFactory.SetRect(player, new Vector2(0.018f, 0.275f), new Vector2(0.265f, 0.575f), Vector2.zero, Vector2.zero);
-            UiFactory.StyleSurface(player, false);
+            Image playerImage = player.GetComponent<Image>();
+            playerImage.preserveAspect = false;
+            if (playerSkin == null) UiFactory.StyleSurface(player, false);
             radioNightGlow = UiFactory.Image("RadioNightGlow", player, UiFactory.RoundedSprite(), new Color(0.35f, 1f, 0.22f, 0.08f), false);
             radioNightGlow.type = Image.Type.Sliced;
             radioNightGlow.raycastTarget = false;
@@ -468,25 +473,25 @@ namespace SortingStation
 
             TextMeshProUGUI heading = UiFactory.Label("RadioHeading", player, "РАДИО • МАРШРУТ", theme.CaptionFontSize,
                 new Color(0.65f, 1f, 0.58f, 1f), TextAlignmentOptions.Center, UiFontRole.Control);
-            UiFactory.SetRect(heading.rectTransform, new Vector2(0.05f, 0.79f), new Vector2(0.95f, 0.96f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(heading.rectTransform, new Vector2(0.10f, 0.73f), new Vector2(0.90f, 0.86f), Vector2.zero, Vector2.zero);
             radioTrackTitle = UiFactory.Label("TrackTitle", player, "Радио выключено", theme.CaptionFontSize,
                 new Color(0.80f, 1f, 0.72f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
             radioTrackTitle.enableWordWrapping = false;
             radioTrackTitle.overflowMode = TextOverflowModes.Ellipsis;
-            UiFactory.SetRect(radioTrackTitle.rectTransform, new Vector2(0.08f, 0.57f), new Vector2(0.92f, 0.76f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(radioTrackTitle.rectTransform, new Vector2(0.10f, 0.60f), new Vector2(0.90f, 0.72f), Vector2.zero, Vector2.zero);
             radioTime = UiFactory.Label("TrackTime", player, "00:00 - 00:00", theme.CaptionFontSize,
                 new Color(0.47f, 0.84f, 0.61f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
-            UiFactory.SetRect(radioTime.rectTransform, new Vector2(0.05f, 0.43f), new Vector2(0.95f, 0.58f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(radioTime.rectTransform, new Vector2(0.10f, 0.50f), new Vector2(0.90f, 0.60f), Vector2.zero, Vector2.zero);
 
-            radioPowerButton = RadioButton("RadioPower", player, string.Empty, new Vector2(0.38f, 0.12f), new Vector2(0.62f, 0.39f), ToggleRadio, "Радио: включить или поставить на паузу");
-            radioPlayGlyph = CreateRadioVisual(radioPowerButton, services.CabScenery != null ? services.CabScenery.RadioPlay : null, "play");
+            radioPowerButton = RadioButton("RadioPower", player, string.Empty, new Vector2(0.405f, 0.29f), new Vector2(0.595f, 0.49f), ToggleRadio, "Радио: включить или поставить на паузу");
+            radioPlayGlyph = CreateRadioGlyph(radioPowerButton, "play");
             radioPauseGlyph = CreateRadioGlyph(radioPowerButton, "pause");
-            AccessibleButton previous = RadioButton("RadioPrevious", player, string.Empty, new Vector2(0.08f, 0.12f), new Vector2(0.31f, 0.39f), PreviousRadioTrack, "Предыдущий трек");
-            CreateRadioVisual(previous, services.CabScenery != null ? services.CabScenery.RadioPrevious : null, "previous");
-            AccessibleButton next = RadioButton("RadioNext", player, string.Empty, new Vector2(0.69f, 0.12f), new Vector2(0.92f, 0.39f), NextRadioTrack, "Следующий трек");
-            CreateRadioVisual(next, services.CabScenery != null ? services.CabScenery.RadioNext : null, "next");
-            radioPlaylistButton = RadioButton("RadioPlaylist", player, string.Empty, new Vector2(0.05f, -0.15f), new Vector2(0.95f, 0.06f), TogglePlaylist, "Открыть список треков");
-            CreateRadioVisual(radioPlaylistButton, services.CabScenery != null ? services.CabScenery.RadioPlaylist : null, "playlist");
+            AccessibleButton previous = RadioButton("RadioPrevious", player, string.Empty, new Vector2(0.20f, 0.29f), new Vector2(0.38f, 0.49f), PreviousRadioTrack, "Предыдущий трек");
+            CreateRadioGlyph(previous, "previous");
+            AccessibleButton next = RadioButton("RadioNext", player, string.Empty, new Vector2(0.62f, 0.29f), new Vector2(0.80f, 0.49f), NextRadioTrack, "Следующий трек");
+            CreateRadioGlyph(next, "next");
+            radioPlaylistButton = RadioButton("RadioPlaylist", player, string.Empty, new Vector2(0.27f, 0.12f), new Vector2(0.73f, 0.27f), TogglePlaylist, "Открыть список треков");
+            CreateRadioGlyph(radioPlaylistButton, "playlist");
 
             radioPlaylist = UiFactory.Panel("RadioPlaylist", cabInterior, new Color(0.02f, 0.04f, 0.055f, 0.96f), UiFactory.RoundedSprite());
             UiFactory.SetRect(radioPlaylist, new Vector2(0.018f, 0.075f), new Vector2(0.265f, 0.27f), Vector2.zero, Vector2.zero);
@@ -588,10 +593,11 @@ namespace SortingStation
         private AccessibleButton RadioButton(string name, Transform parent, string label, Vector2 min, Vector2 max, System.Action action, string accessibleName)
         {
             AccessibleButton button = UiFactory.Button(name, parent, focusGroup, label, new Color(0.10f, 0.20f, 0.16f, 1f),
-                new Color(0.34f, 0.74f, 0.35f, 1f), action, services.Settings.CaptionFontSize);
+                new Color(0.34f, 0.94f, 0.48f, 0.28f), action, services.Settings.CaptionFontSize);
             UiFactory.SetRect(button.RectTransform, min, max, Vector2.zero, Vector2.zero);
             button.SetAccessibleName(accessibleName);
             button.Label.gameObject.SetActive(false);
+            button.SetIdleColor(Color.clear);
             return button;
         }
 
@@ -600,42 +606,10 @@ namespace SortingStation
             RectTransform root = new GameObject("Glyph_" + kind, typeof(RectTransform)).GetComponent<RectTransform>();
             root.SetParent(button.transform, false);
             UiFactory.Stretch(root);
-            Color color = new Color(0.75f, 1f, 0.70f, 1f);
-            switch (kind)
-            {
-                case "pause":
-                    GlyphStroke(root, color, new Vector2(0.41f, 0.5f), 8f, 30f, 0f);
-                    GlyphStroke(root, color, new Vector2(0.59f, 0.5f), 8f, 30f, 0f);
-                    break;
-                case "previous":
-                    GlyphStroke(root, color, new Vector2(0.35f, 0.5f), 7f, 34f, 0f);
-                    GlyphStroke(root, color, new Vector2(0.60f, 0.62f), 7f, 30f, 45f);
-                    GlyphStroke(root, color, new Vector2(0.60f, 0.38f), 7f, 30f, -45f);
-                    break;
-                case "next":
-                    GlyphStroke(root, color, new Vector2(0.65f, 0.5f), 7f, 34f, 0f);
-                    GlyphStroke(root, color, new Vector2(0.40f, 0.62f), 7f, 30f, -45f);
-                    GlyphStroke(root, color, new Vector2(0.40f, 0.38f), 7f, 30f, 45f);
-                    break;
-                case "playlist":
-                    for (int i = 0; i < 3; i++) GlyphStroke(root, color, new Vector2(0.5f, 0.30f + i * 0.20f), 64f, 6f, 90f);
-                    break;
-                default:
-                    GlyphStroke(root, color, new Vector2(0.43f, 0.62f), 7f, 30f, 45f);
-                    GlyphStroke(root, color, new Vector2(0.43f, 0.38f), 7f, 30f, -45f);
-                    GlyphStroke(root, color, new Vector2(0.63f, 0.5f), 7f, 31f, 0f);
-                    break;
-            }
+            Image icon = UiFactory.Image("Icon", root, CreateRadioIconSprite(kind), new Color(0.74f, 1f, 0.70f, 1f), false);
+            icon.raycastTarget = false;
+            UiFactory.Stretch(icon.rectTransform, 14f, 14f, 14f, 14f);
             return root;
-        }
-
-        private RectTransform CreateRadioVisual(AccessibleButton button, Sprite artwork, string fallbackKind)
-        {
-            if (artwork == null) return CreateRadioGlyph(button, fallbackKind);
-            Image visual = UiFactory.Image("GeneratedRadio_" + fallbackKind, button.transform, artwork, Color.white, false);
-            visual.raycastTarget = false;
-            UiFactory.Stretch(visual.rectTransform, 2f, 2f, 2f, 2f);
-            return visual.rectTransform;
         }
 
         private static void GlyphStroke(Transform parent, Color color, Vector2 center, float width, float height, float angle)
@@ -646,6 +620,68 @@ namespace SortingStation
             stroke.sizeDelta = new Vector2(width, height);
             stroke.localRotation = Quaternion.Euler(0f, 0f, angle);
             stroke.GetComponent<Image>().raycastTarget = false;
+        }
+
+        private static Sprite CreateRadioIconSprite(string kind)
+        {
+            const int size = 96;
+            Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false, true)
+            {
+                name = "Radio icon " + kind,
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp,
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            Color32[] pixels = new Color32[size * size];
+            Color32 ink = new Color32(255, 255, 255, 255);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    bool filled = kind switch
+                    {
+                        "pause" => (x >= 29 && x <= 39 || x >= 57 && x <= 67) && y >= 25 && y <= 71,
+                        "previous" => (x >= 18 && x <= 25 && y >= 24 && y <= 72) ||
+                                      LeftTriangle(x, y, 27, 53, 48, 22) || LeftTriangle(x, y, 46, 72, 48, 22),
+                        "next" => (x >= 71 && x <= 78 && y >= 24 && y <= 72) ||
+                                  RightTriangle(x, y, 24, 50, 48, 22) || RightTriangle(x, y, 43, 69, 48, 22),
+                        "playlist" => PlaylistMark(x, y),
+                        _ => RightTriangle(x, y, 27, 70, 48, 30)
+                    };
+                    pixels[y * size + x] = filled ? ink : new Color32(0, 0, 0, 0);
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
+            sprite.name = "Radio icon " + kind;
+            sprite.hideFlags = HideFlags.HideAndDontSave;
+            return sprite;
+        }
+
+        private static bool RightTriangle(int x, int y, int left, int right, int centerY, int halfHeight)
+        {
+            if (x < left || x > right) return false;
+            float width = Mathf.Max(1f, right - left);
+            return Mathf.Abs(y - centerY) <= halfHeight * (1f - (x - left) / width);
+        }
+
+        private static bool LeftTriangle(int x, int y, int left, int right, int centerY, int halfHeight)
+        {
+            if (x < left || x > right) return false;
+            float width = Mathf.Max(1f, right - left);
+            return Mathf.Abs(y - centerY) <= halfHeight * ((x - left) / width);
+        }
+
+        private static bool PlaylistMark(int x, int y)
+        {
+            for (int row = 0; row < 3; row++)
+            {
+                int centerY = 29 + row * 19;
+                if (x >= 19 && x <= 28 && y >= centerY - 4 && y <= centerY + 4) return true;
+                if (x >= 37 && x <= 77 && y >= centerY - 3 && y <= centerY + 3) return true;
+            }
+            return false;
         }
 
         private void BuildPlaylistEntries()

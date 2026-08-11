@@ -252,6 +252,7 @@ namespace SortingStation.EditorTools
                 LoadSprite(CabRadioArtRoot + "/radio-play-v1.png"),
                 LoadSprite(CabRadioArtRoot + "/radio-next-v1.png"),
                 LoadSprite(CabRadioArtRoot + "/radio-playlist-v1.png"));
+            catalog.ConfigureRadioSkinIfMissing(LoadSprite(CabRadioArtRoot + "/radio-player-skin-v2.png"));
             EditorUtility.SetDirty(catalog);
             return catalog;
         }
@@ -437,6 +438,7 @@ namespace SortingStation.EditorTools
             });
             ConfigureAtlas(CabRadioArtRoot + "/radio-controls-atlas-v1.png",
                 "radio_previous", "radio_play", "radio_next", "radio_playlist");
+            ConfigureSingleSprite(CabRadioArtRoot + "/radio-player-skin-v2.png");
         }
 
         private static void ConfigureControlArtwork(CabRideDefinition cab)
