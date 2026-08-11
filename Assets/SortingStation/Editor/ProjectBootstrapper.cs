@@ -356,7 +356,7 @@ namespace SortingStation.EditorTools
 
         private static void ConfigurePlayerSettings(AppSettings settings, VisualCatalog visuals)
         {
-            PlayerSettings.companyName = "LunacharProd";
+            PlayerSettings.companyName = "LunacharProduction";
             PlayerSettings.productName = settings.ProductName;
             PlayerSettings.bundleVersion = "1.0.0";
             PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, AndroidPackage);

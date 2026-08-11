@@ -73,6 +73,11 @@ namespace SortingStation
             fill.fillOrigin = 0;
             fill.transform.SetAsFirstSibling();
             settings.gameObject.AddComponent<HoldToOpenButton>().Initialize(theme.ParentHoldSeconds, settingsText, fill, OpenSettings);
+
+            AccessibleButton exit = UiFactory.Button("ExitGame", root, mainFocus, "Выйти\nиз игры", theme.BrakeColor,
+                theme.SelectedColor, OpenExitConfirmation, theme.CaptionFontSize);
+            UiFactory.SetRect(exit.RectTransform, new Vector2(0.85f, 0.01f), new Vector2(0.99f, 0.105f), Vector2.zero, Vector2.zero);
+            exit.SetAccessibleName("Выйти из игры");
         }
 
         private void CreateModeButton(GameMode mode, string label, Vector2 min, Vector2 max, Color color)
@@ -139,6 +144,38 @@ namespace SortingStation
                 mainFocus.FocusFirst();
             });
             modal = view.gameObject;
+        }
+
+        private void OpenExitConfirmation()
+        {
+            if (modal != null) return;
+            mainFocus.enabled = false;
+            RectTransform overlay = UiFactory.Panel("ExitOverlay", root, new Color(0f, 0f, 0f, 0.72f));
+            UiFactory.Stretch(overlay);
+            modal = overlay.gameObject;
+            RectTransform card = UiFactory.Panel("ExitCard", overlay, services.Settings.PanelColor);
+            UiFactory.StyleSurface(card);
+            UiFactory.SetRect(card, new Vector2(0.25f, 0.31f), new Vector2(0.75f, 0.69f), Vector2.zero, Vector2.zero);
+            TextMeshProUGUI title = UiFactory.Label("Title", card, "Выйти из игры?", services.Settings.TitleFontSize,
+                services.Settings.TextColor, TextAlignmentOptions.Center, UiFontRole.Display);
+            UiFactory.SetRect(title.rectTransform, new Vector2(0.07f, 0.60f), new Vector2(0.93f, 0.89f), Vector2.zero, Vector2.zero);
+            TextMeshProUGUI hint = UiFactory.Label("Hint", card, "Можно вернуться в игру позже.", services.Settings.ControlFontSize,
+                services.Settings.MutedTextColor, TextAlignmentOptions.Center, UiFontRole.Body);
+            UiFactory.SetRect(hint.rectTransform, new Vector2(0.08f, 0.41f), new Vector2(0.92f, 0.61f), Vector2.zero, Vector2.zero);
+            AccessibleFocusGroup focus = card.gameObject.AddComponent<AccessibleFocusGroup>();
+            focus.Cancelled += CloseModal;
+            AccessibleButton cancel = UiFactory.Button("CancelExit", card, focus, "Остаться", services.Settings.PrimaryColor,
+                services.Settings.SelectedColor, CloseModal, services.Settings.ControlFontSize);
+            UiFactory.SetRect(cancel.RectTransform, new Vector2(0.08f, 0.10f), new Vector2(0.46f, 0.34f), Vector2.zero, Vector2.zero);
+            AccessibleButton confirm = UiFactory.Button("ConfirmExit", card, focus, "Выйти", services.Settings.BrakeColor,
+                services.Settings.SelectedColor, ExitGame, services.Settings.ControlFontSize);
+            UiFactory.SetRect(confirm.RectTransform, new Vector2(0.54f, 0.10f), new Vector2(0.92f, 0.34f), Vector2.zero, Vector2.zero);
+        }
+
+        private void ExitGame()
+        {
+            services.Audio.StopAllLoops();
+            Application.Quit();
         }
 
         private void CloseModal()
