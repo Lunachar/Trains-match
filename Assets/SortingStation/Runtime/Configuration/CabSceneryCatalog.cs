@@ -13,6 +13,13 @@ namespace SortingStation
         [SerializeField] private Sprite headlightMask;
         [SerializeField] private Sprite cabinLightMask;
 
+        [Header("Radio player artwork")]
+        [Tooltip("Four generated controls: previous, play, next and playlist. They can be replaced directly here.")]
+        [SerializeField] private Sprite radioPrevious;
+        [SerializeField] private Sprite radioPlay;
+        [SerializeField] private Sprite radioNext;
+        [SerializeField] private Sprite radioPlaylist;
+
         [Header("Endless route")]
         [SerializeField] private RouteSegmentDefinition[] routeSegments = Array.Empty<RouteSegmentDefinition>();
         [SerializeField] private CabSceneryDefinition[] scenery = Array.Empty<CabSceneryDefinition>();
@@ -33,6 +40,10 @@ namespace SortingStation
         public Sprite Keychain => keychain;
         public Sprite HeadlightMask => headlightMask;
         public Sprite CabinLightMask => cabinLightMask;
+        public Sprite RadioPrevious => radioPrevious;
+        public Sprite RadioPlay => radioPlay;
+        public Sprite RadioNext => radioNext;
+        public Sprite RadioPlaylist => radioPlaylist;
         public RouteSegmentDefinition[] RouteSegments => routeSegments ?? Array.Empty<RouteSegmentDefinition>();
         public CabSceneryDefinition[] Scenery => scenery ?? Array.Empty<CabSceneryDefinition>();
         public int PoolSize => Mathf.Clamp(poolSize, 16, 96);
@@ -126,6 +137,14 @@ namespace SortingStation
             if (shrubBand == null) shrubBand = shrubs;
             if (distantBackdrop == null) distantBackdrop = distant;
             if (townBand == null) townBand = town;
+        }
+
+        public void ConfigureRadioArtworkIfMissing(Sprite previous, Sprite play, Sprite next, Sprite playlist)
+        {
+            if (radioPrevious == null) radioPrevious = previous;
+            if (radioPlay == null) radioPlay = play;
+            if (radioNext == null) radioNext = next;
+            if (radioPlaylist == null) radioPlaylist = playlist;
         }
 #endif
     }

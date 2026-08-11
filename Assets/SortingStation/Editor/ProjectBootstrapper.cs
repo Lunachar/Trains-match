@@ -19,6 +19,7 @@ namespace SortingStation.EditorTools
         private const string CabArtRoot = Root + "/Art/Cab";
         private const string CabSceneryArtRoot = CabArtRoot + "/Scenery";
         private const string CabControlsArtRoot = CabArtRoot + "/Controls";
+        private const string CabRadioArtRoot = CabArtRoot + "/Radio";
         private const string CabRouteRoot = Root + "/Data/CabRoutes";
         private const string AudioRoot = Root + "/Audio/Imported";
         private const string AndroidPackage = "com.lunacharprod.sortingstation";
@@ -77,7 +78,7 @@ namespace SortingStation.EditorTools
         {
             string[] folders =
             {
-                ConfigRoot, LevelRoot, SceneRoot, GeneratedArtRoot, CabArtRoot, CabSceneryArtRoot, CabControlsArtRoot, CabRouteRoot, AudioRoot,
+                ConfigRoot, LevelRoot, SceneRoot, GeneratedArtRoot, CabArtRoot, CabSceneryArtRoot, CabControlsArtRoot, CabRadioArtRoot, CabRouteRoot, AudioRoot,
                 Root + "/Prefabs", Root + "/Builds/Android", Root + "/Builds/Windows"
             };
             foreach (string folder in folders)
@@ -246,6 +247,11 @@ namespace SortingStation.EditorTools
                 LoadNamedSprite(CabSceneryArtRoot + "/parallax-bands-atlas-v1.png", "shrub_band"),
                 LoadNamedSprite(CabSceneryArtRoot + "/parallax-bands-atlas-v1.png", "distant_mountains"),
                 LoadNamedSprite(CabSceneryArtRoot + "/parallax-bands-atlas-v1.png", "town_band"));
+            catalog.ConfigureRadioArtworkIfMissing(
+                LoadSprite(CabRadioArtRoot + "/radio-previous-v1.png"),
+                LoadSprite(CabRadioArtRoot + "/radio-play-v1.png"),
+                LoadSprite(CabRadioArtRoot + "/radio-next-v1.png"),
+                LoadSprite(CabRadioArtRoot + "/radio-playlist-v1.png"));
             EditorUtility.SetDirty(catalog);
             return catalog;
         }
@@ -429,6 +435,8 @@ namespace SortingStation.EditorTools
                 "control_horn", "control_headlights", "control_cabin_light", "control_wipers",
                 "control_bell", "control_throttle", "control_brake", "control_radio"
             });
+            ConfigureAtlas(CabRadioArtRoot + "/radio-controls-atlas-v1.png",
+                "radio_previous", "radio_play", "radio_next", "radio_playlist");
         }
 
         private static void ConfigureControlArtwork(CabRideDefinition cab)

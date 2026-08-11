@@ -27,6 +27,7 @@ namespace SortingStation
         private RectTransform radioPlaylist;
         private AccessibleButton radioPowerButton;
         private AccessibleButton radioPlaylistButton;
+        private Image radioNightGlow;
         private RectTransform radioPlayGlyph;
         private RectTransform radioPauseGlyph;
         private bool playlistOpen;
@@ -63,15 +64,24 @@ namespace SortingStation
         private bool bellLit;
         private int lastBrakePercent = -1;
         private bool lastBrakeActive;
+        private AccessibleButton dispatcherButton;
+        private Image dispatcherLamp;
+        private bool departureAuthorized;
+        private bool vigilanceAlarm;
+        private bool automaticStop;
+        private float nextVigilanceAt;
+        private float vigilanceDeadline;
+        private float nextVigilanceBeep;
+        private int trainNumber;
 
         private void Start()
         {
             services = AppServices.Ensure();
             services.Audio.StopAllLoops();
             motion = new CabMotionModel(services.CabRide);
+            trainNumber = 2400 + Mathf.Abs(services.CabRide.RouteSeed % 6000);
             Build();
-            SetStatus("Кабина готова. Выберите прибор");
-            services.Speech.Speak("Свободная поездка. Стрелки вверх и вниз управляют тягой. Пробел включает выбранный прибор.");
+            PromptDeparture();
         }
 
         private void Update()
@@ -86,7 +96,8 @@ namespace SortingStation
                                 (keyboard.spaceKey.isPressed || keyboard.enterKey.isPressed || keyboard.numpadEnterKey.isPressed);
             }
 
-            float brake01 = pointerBrake ? pointerBrakeStrength : keyboardBrake || Time.unscaledTime < brakePulseUntil ? 1f : 0f;
+            UpdateVigilance();
+            float brake01 = automaticStop ? 1f : pointerBrake ? pointerBrakeStrength : keyboardBrake || Time.unscaledTime < brakePulseUntil ? 1f : 0f;
             motion.Step(dt, brake01);
             services.Audio.SetRails(motion.Speed01);
             world.Advance(motion.Speed01, motion.Acceleration01, dt);
@@ -98,6 +109,7 @@ namespace SortingStation
             UpdateBrakeVisual(brake01);
             UpdateMomentaryGlow(CabControlAction.Horn, hornGlowUntil, ref hornLit);
             UpdateMomentaryGlow(CabControlAction.Bell, bellGlowUntil, ref bellLit);
+            UpdateDispatcherVisual();
         }
 
         private void OnDestroy()
@@ -110,6 +122,10 @@ namespace SortingStation
 
         public void ConfigureSmokeDemo(bool tunnel)
         {
+            departureAuthorized = true;
+            vigilanceAlarm = false;
+            automaticStop = false;
+            if (dispatcherButton != null) dispatcherButton.gameObject.SetActive(false);
             motion.SetThrottle(0.625f);
             headlights = true;
             cabinLight = true;
@@ -163,6 +179,7 @@ namespace SortingStation
             BuildKeychain();
             BuildDisplays();
             BuildControls();
+            BuildDispatcherButton();
             BuildRadioPlayer();
             BuildKeychainInteraction();
             BuildHeader();
@@ -443,6 +460,11 @@ namespace SortingStation
             RectTransform player = UiFactory.Panel("RetroRadioPlayer", cabInterior, new Color(0.025f, 0.055f, 0.07f, 0.94f), UiFactory.RoundedSprite());
             UiFactory.SetRect(player, new Vector2(0.018f, 0.275f), new Vector2(0.265f, 0.575f), Vector2.zero, Vector2.zero);
             UiFactory.StyleSurface(player, false);
+            radioNightGlow = UiFactory.Image("RadioNightGlow", player, UiFactory.RoundedSprite(), new Color(0.35f, 1f, 0.22f, 0.08f), false);
+            radioNightGlow.type = Image.Type.Sliced;
+            radioNightGlow.raycastTarget = false;
+            UiFactory.SetRect(radioNightGlow.rectTransform, new Vector2(-0.035f, -0.045f), new Vector2(1.035f, 1.045f), Vector2.zero, Vector2.zero);
+            radioNightGlow.transform.SetAsFirstSibling();
 
             TextMeshProUGUI heading = UiFactory.Label("RadioHeading", player, "РАДИО • МАРШРУТ", theme.CaptionFontSize,
                 new Color(0.65f, 1f, 0.58f, 1f), TextAlignmentOptions.Center, UiFontRole.Control);
@@ -457,14 +479,14 @@ namespace SortingStation
             UiFactory.SetRect(radioTime.rectTransform, new Vector2(0.05f, 0.43f), new Vector2(0.95f, 0.58f), Vector2.zero, Vector2.zero);
 
             radioPowerButton = RadioButton("RadioPower", player, string.Empty, new Vector2(0.38f, 0.12f), new Vector2(0.62f, 0.39f), ToggleRadio, "Радио: включить или поставить на паузу");
-            radioPlayGlyph = CreateRadioGlyph(radioPowerButton, "play");
+            radioPlayGlyph = CreateRadioVisual(radioPowerButton, services.CabScenery != null ? services.CabScenery.RadioPlay : null, "play");
             radioPauseGlyph = CreateRadioGlyph(radioPowerButton, "pause");
             AccessibleButton previous = RadioButton("RadioPrevious", player, string.Empty, new Vector2(0.08f, 0.12f), new Vector2(0.31f, 0.39f), PreviousRadioTrack, "Предыдущий трек");
-            CreateRadioGlyph(previous, "previous");
+            CreateRadioVisual(previous, services.CabScenery != null ? services.CabScenery.RadioPrevious : null, "previous");
             AccessibleButton next = RadioButton("RadioNext", player, string.Empty, new Vector2(0.69f, 0.12f), new Vector2(0.92f, 0.39f), NextRadioTrack, "Следующий трек");
-            CreateRadioGlyph(next, "next");
+            CreateRadioVisual(next, services.CabScenery != null ? services.CabScenery.RadioNext : null, "next");
             radioPlaylistButton = RadioButton("RadioPlaylist", player, string.Empty, new Vector2(0.05f, -0.15f), new Vector2(0.95f, 0.06f), TogglePlaylist, "Открыть список треков");
-            CreateRadioGlyph(radioPlaylistButton, "playlist");
+            CreateRadioVisual(radioPlaylistButton, services.CabScenery != null ? services.CabScenery.RadioPlaylist : null, "playlist");
 
             radioPlaylist = UiFactory.Panel("RadioPlaylist", cabInterior, new Color(0.02f, 0.04f, 0.055f, 0.96f), UiFactory.RoundedSprite());
             UiFactory.SetRect(radioPlaylist, new Vector2(0.018f, 0.075f), new Vector2(0.265f, 0.27f), Vector2.zero, Vector2.zero);
@@ -472,6 +494,95 @@ namespace SortingStation
             radioPlaylist.gameObject.SetActive(false);
             BuildPlaylistEntries();
             UpdateRadioPlayer();
+        }
+
+        private void BuildDispatcherButton()
+        {
+            AppSettings theme = services.Settings;
+            dispatcherButton = UiFactory.Button("DispatcherAcknowledge", cabInterior, focusGroup, "●",
+                new Color(0.42f, 0.035f, 0.045f, 0.96f), new Color(1f, 0.30f, 0.22f, 1f),
+                AcknowledgeDispatcher, theme.ControlFontSize);
+            UiFactory.SetRect(dispatcherButton.RectTransform, new Vector2(0.752f, 0.785f), new Vector2(0.865f, 0.905f),
+                Vector2.zero, Vector2.zero);
+            dispatcherButton.ConfigurePersistentPress(false, 8f);
+            dispatcherButton.SetAccessibleName("Красная кнопка диспетчера: подтвердить готовность");
+            dispatcherLamp = UiFactory.Image("DispatcherLamp", dispatcherButton.transform, UiFactory.RoundedSprite(),
+                new Color(1f, 0.24f, 0.18f, 0.94f), false);
+            dispatcherLamp.type = Image.Type.Sliced;
+            dispatcherLamp.raycastTarget = false;
+            UiFactory.SetRect(dispatcherLamp.rectTransform, new Vector2(0.19f, 0.19f), new Vector2(0.81f, 0.81f),
+                Vector2.zero, Vector2.zero);
+            dispatcherLamp.transform.SetAsFirstSibling();
+        }
+
+        private void PromptDeparture()
+        {
+            SetStatus("Диспетчер: состав №" + trainNumber + ". Подтвердите готовность красной кнопкой.");
+            services.Speech.Speak("Диспетчер. Состав номер " + trainNumber +
+                ". Дано разрешение на старт движения. Подтвердите готовность.");
+        }
+
+        private void AcknowledgeDispatcher()
+        {
+            services.Audio.Play(SoundCue.Toggle);
+            if (!departureAuthorized)
+            {
+                departureAuthorized = true;
+                nextVigilanceAt = Time.unscaledTime + 60f;
+                SetStatus("Диспетчер: движение разрешено. Можно набрать тягу.");
+                services.Speech.Speak("Диспетчер. Движение разрешено.");
+                dispatcherButton.SetAccessibleName("Красная кнопка диспетчера: ожидание проверки бдительности");
+                return;
+            }
+
+            if (!vigilanceAlarm) return;
+            vigilanceAlarm = false;
+            nextVigilanceAt = Time.unscaledTime + 120f;
+            SetStatus("Бдительность подтверждена. Следующая проверка через две минуты.");
+            services.Speech.Speak("Бдительность подтверждена.");
+        }
+
+        private void UpdateVigilance()
+        {
+            if (!departureAuthorized || automaticStop) return;
+            float now = Time.unscaledTime;
+            if (!vigilanceAlarm && now >= nextVigilanceAt)
+            {
+                vigilanceAlarm = true;
+                vigilanceDeadline = now + 20f;
+                nextVigilanceBeep = now;
+                SetStatus("Проверка бдительности: нажмите мигающую красную кнопку за 20 секунд.");
+                services.Speech.Speak("Проверка бдительности. Нажмите красную кнопку.");
+            }
+            if (!vigilanceAlarm) return;
+            if (now >= nextVigilanceBeep)
+            {
+                services.Audio.Play(SoundCue.Bell);
+                nextVigilanceBeep = now + 2.2f;
+            }
+            if (now < vigilanceDeadline) return;
+
+            vigilanceAlarm = false;
+            automaticStop = true;
+            motion.SetThrottle(0f);
+            services.Audio.Play(SoundCue.Brake);
+            SetStatus("Нет подтверждения: поезд автоматически останавливается.");
+            services.Speech.Speak("Нет подтверждения. Поезд автоматически останавливается.");
+            dispatcherButton.SetAccessibleName("Красная кнопка диспетчера: поезд остановлен автоматически");
+        }
+
+        private void UpdateDispatcherVisual()
+        {
+            if (dispatcherButton == null || dispatcherLamp == null) return;
+            float now = Time.unscaledTime;
+            float alarmPulse = vigilanceAlarm ? 0.45f + 0.55f * (0.5f + 0.5f * Mathf.Sin(now * 10f)) : 1f;
+            Color lampColor = automaticStop ? new Color(0.42f, 0.05f, 0.05f, 0.55f) :
+                departureAuthorized ? new Color(0.72f, 0.08f, 0.07f, 0.64f) : new Color(1f, 0.24f, 0.18f, 0.86f);
+            lampColor.a *= alarmPulse;
+            dispatcherLamp.color = lampColor;
+            dispatcherButton.RectTransform.localScale = vigilanceAlarm
+                ? Vector3.one * (1f + 0.06f * (0.5f + 0.5f * Mathf.Sin(now * 10f)))
+                : Vector3.one;
         }
 
         private AccessibleButton RadioButton(string name, Transform parent, string label, Vector2 min, Vector2 max, System.Action action, string accessibleName)
@@ -516,6 +627,15 @@ namespace SortingStation
                     break;
             }
             return root;
+        }
+
+        private RectTransform CreateRadioVisual(AccessibleButton button, Sprite artwork, string fallbackKind)
+        {
+            if (artwork == null) return CreateRadioGlyph(button, fallbackKind);
+            Image visual = UiFactory.Image("GeneratedRadio_" + fallbackKind, button.transform, artwork, Color.white, false);
+            visual.raycastTarget = false;
+            UiFactory.Stretch(visual.rectTransform, 2f, 2f, 2f, 2f);
+            return visual.rectTransform;
         }
 
         private static void GlyphStroke(Transform parent, Color color, Vector2 center, float width, float height, float angle)
@@ -692,6 +812,17 @@ namespace SortingStation
 
         private void AdjustThrottle(float delta)
         {
+            if (!departureAuthorized)
+            {
+                services.Audio.Play(SoundCue.GentleError);
+                PromptDeparture();
+                return;
+            }
+            if (automaticStop)
+            {
+                SetStatus("Поезд остановлен автоматически. Вернитесь в меню и начните новую поездку.");
+                return;
+            }
             motion.AdjustThrottle(delta);
             services.Audio.Play(SoundCue.Switch);
             UpdateThrottleVisual();
@@ -700,6 +831,13 @@ namespace SortingStation
 
         private void SetThrottleFromPointer(PointerEventData eventData)
         {
+            if (!departureAuthorized)
+            {
+                services.Audio.Play(SoundCue.GentleError);
+                PromptDeparture();
+                return;
+            }
+            if (automaticStop) return;
             AccessibleButton throttleButton = controls[CabControlAction.Throttle];
             Camera camera = eventData.pressEventCamera;
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(throttleButton.RectTransform,
@@ -854,6 +992,11 @@ namespace SortingStation
             cabinGlow.color = new Color(1f, 0.67f, 0.25f, cabinAlpha);
             instrumentGlow.color = new Color(0.25f, 0.72f, 1f,
                 services.CabRide.InstrumentIdleAlpha + cabinAlpha * services.CabRide.InstrumentCabinBoost);
+            if (radioNightGlow != null)
+            {
+                float nightGlow = 0.07f + cabinAlpha * 0.44f + world.TunnelBlend * 0.15f;
+                radioNightGlow.color = new Color(0.35f, 1f, 0.22f, nightGlow);
+            }
         }
 
         private void AnimateWipers(float deltaTime)
