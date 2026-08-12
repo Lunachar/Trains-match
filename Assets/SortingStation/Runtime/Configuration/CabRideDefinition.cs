@@ -7,7 +7,7 @@ namespace SortingStation
     [CreateAssetMenu(menuName = "Sorting Station/Cab Ride", fileName = "CabRideDefinition")]
     public sealed class CabRideDefinition : ScriptableObject
     {
-        private const int CurrentConfigurationVersion = 6;
+        private const int CurrentConfigurationVersion = 7;
 
         [SerializeField, HideInInspector] private int configurationVersion;
         [Header("Motion")]
@@ -30,9 +30,9 @@ namespace SortingStation
         [SerializeField] [Range(0f, 12f)] private float keychainAccelerationDegrees = 8f;
         [SerializeField] [Range(0f, 6f)] private float keychainRailDegrees = 2.2f;
         [SerializeField] [Range(0.15f, 0.8f)] private float keychainSmoothSeconds = 0.34f;
-        [SerializeField] [Range(0f, 10f)] private float cabinSwayPixels = 3.5f;
-        [SerializeField] [Range(0f, 1.5f)] private float cabinSwayRotationDegrees = 0.28f;
-        [SerializeField] [Range(0.15f, 0.8f)] private float cabinSwaySmoothSeconds = 0.34f;
+        [SerializeField] [Range(0f, 10f)] private float cabinSwayPixels = 7f;
+        [SerializeField] [Range(0f, 1.5f)] private float cabinSwayRotationDegrees = 0.48f;
+        [SerializeField] [Range(0.15f, 0.8f)] private float cabinSwaySmoothSeconds = 0.26f;
 
         [Header("Lighting")]
         [SerializeField] [Range(0.05f, 0.5f)] private float headlightLandscapeAlpha = 0.20f;
@@ -130,9 +130,9 @@ namespace SortingStation
             keychainAccelerationDegrees = 8f;
             keychainRailDegrees = 2.2f;
             keychainSmoothSeconds = 0.34f;
-            cabinSwayPixels = 3.5f;
-            cabinSwayRotationDegrees = 0.28f;
-            cabinSwaySmoothSeconds = 0.34f;
+            cabinSwayPixels = 7f;
+            cabinSwayRotationDegrees = 0.48f;
+            cabinSwaySmoothSeconds = 0.26f;
             headlightLandscapeAlpha = 0.20f;
             headlightTunnelAlpha = 0.58f;
             cabinLightAlpha = 0.24f;
@@ -154,9 +154,9 @@ namespace SortingStation
             }
             if (configurationVersion < CurrentConfigurationVersion)
             {
-                cabinSwayPixels = 3.5f;
-                cabinSwayRotationDegrees = 0.28f;
-                cabinSwaySmoothSeconds = 0.34f;
+                cabinSwayPixels = 7f;
+                cabinSwayRotationDegrees = 0.48f;
+                cabinSwaySmoothSeconds = 0.26f;
                 configurationVersion = CurrentConfigurationVersion;
             }
             if (controls == null || controls.Length == 0)

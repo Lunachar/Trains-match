@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff11a5a7f9bf2b9449c48adf8f06281c, type: 3}
   m_Name: CabRideDefinition
   m_EditorClassIdentifier: 
-  configurationVersion: 6
+  configurationVersion: 7
   maximumSpeedKph: 90
   accelerationSeconds: 7
   serviceBrakeSeconds: 4.5
@@ -74,9 +74,9 @@ MonoBehaviour:
   keychainAccelerationDegrees: 8
   keychainRailDegrees: 2.2
   keychainSmoothSeconds: 0.34
-  cabinSwayPixels: 3.5
-  cabinSwayRotationDegrees: 0.28
-  cabinSwaySmoothSeconds: 0.34
+  cabinSwayPixels: 7
+  cabinSwayRotationDegrees: 0.48
+  cabinSwaySmoothSeconds: 0.26
   headlightLandscapeAlpha: 0.2
   headlightTunnelAlpha: 0.58
   cabinLightAlpha: 0.24

@@ -19,6 +19,7 @@ namespace SortingStation.EditorTools
         private const string StartedKey = "SortingStation.EditorSmoke.Started";
         private const string FailedKey = "SortingStation.EditorSmoke.Failed";
         private const string TimelineKey = "SortingStation.EditorSmoke.Timeline";
+        private const string ExpectedCountKey = "SortingStation.EditorSmoke.ExpectedCount";
         private const int ExpectedImageCount = 7;
         private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(2);
         private static readonly string[] ExpectedNames =
@@ -52,6 +53,9 @@ namespace SortingStation.EditorTools
         {
             string output = ReadArgument("-smokeOutput");
             bool timeline = HasArgument("-rideTimeline");
+            int expectedCount = HasArgument("-trackPreview") ? 3 :
+                HasArgument("-departurePreview") ? 1 :
+                timeline ? 3 : ExpectedImageCount;
             if (string.IsNullOrWhiteSpace(output))
             {
                 output = Path.GetFullPath(Path.Combine("Logs", "SmokeScreensFinal"));
@@ -63,6 +67,7 @@ namespace SortingStation.EditorTools
             SessionState.SetBool(ActiveKey, true);
             SessionState.SetBool(FailedKey, false);
             SessionState.SetBool(TimelineKey, timeline);
+            SessionState.SetInt(ExpectedCountKey, expectedCount);
             SessionState.SetString(OutputKey, output);
             SessionState.SetString(StartedKey, DateTime.UtcNow.Ticks.ToString());
             Environment.SetEnvironmentVariable("SORTING_STATION_SMOKE", "1");
@@ -83,13 +88,14 @@ namespace SortingStation.EditorTools
         {
             string output = SessionState.GetString(OutputKey, string.Empty);
             bool timeline = SessionState.GetBool(TimelineKey, false);
-            int expectedCount = timeline ? 3 : ExpectedImageCount;
+            int expectedCount = SessionState.GetInt(ExpectedCountKey, timeline ? 3 : ExpectedImageCount);
             bool complete = Directory.Exists(output) && Directory.EnumerateFiles(output, "*.png").Count() >= expectedCount;
             DateTime started = ReadStartedTime();
             TimeSpan timeout = timeline ? TimeSpan.FromMinutes(3) : Timeout;
             bool timedOut = DateTime.UtcNow - started > timeout;
 
-            if (complete && !timeline && !ValidateCaptures(output, out string validationError))
+            if (complete && expectedCount == ExpectedImageCount &&
+                !ValidateCaptures(output, out string validationError))
             {
                 SessionState.SetBool(FailedKey, true);
                 Debug.LogError("Editor smoke capture is invalid: " + validationError);
@@ -116,6 +122,7 @@ namespace SortingStation.EditorTools
             SessionState.EraseString(OutputKey);
             SessionState.EraseString(StartedKey);
             SessionState.EraseBool(TimelineKey);
+            SessionState.EraseInt(ExpectedCountKey);
             Environment.SetEnvironmentVariable("SORTING_STATION_SMOKE", null);
 
             if (Application.isBatchMode)

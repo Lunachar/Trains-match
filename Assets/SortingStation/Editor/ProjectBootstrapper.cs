@@ -166,9 +166,9 @@ namespace SortingStation.EditorTools
             {
                 Route("meadow", "Луг и пастбище", RouteSegmentType.Meadow, 155f, 1.50f, 0, 1.10f, "#F1F7DD", false, false),
                 Route("forest", "Лес", RouteSegmentType.Forest, 165f, 1.15f, 0, 1.60f, "#D9EDDC", false, false),
-                Route("village", "Деревня", RouteSegmentType.Village, 175f, 0.90f, 1, 1.15f, "#FFF0D6", true, false),
-                Route("town", "Город", RouteSegmentType.Town, 185f, 0.68f, 2, 1.30f, "#E1E9EF", true, false),
-                Route("road", "Дорога", RouteSegmentType.Road, 145f, 0.92f, 1, 0.95f, "#F3EBD8", true, false),
+                Route("village", "Деревня", RouteSegmentType.Village, 175f, 0.90f, 1, 1.15f, "#FFF0D6", true, false, TrackFeature.SwitchLeft),
+                Route("town", "Город", RouteSegmentType.Town, 185f, 0.68f, 2, 1.30f, "#E1E9EF", true, false, TrackFeature.SwitchRight),
+                Route("road", "Дорога", RouteSegmentType.Road, 145f, 0.92f, 1, 0.95f, "#F3EBD8", true, false, TrackFeature.LevelCrossing),
                 Route("water", "Река и озеро", RouteSegmentType.Water, 155f, 0.58f, 2, 0.82f, "#D8F2F7", false, true),
                 Route("mountain_tunnel", "Горный туннель", RouteSegmentType.MountainTunnel, 190f, 0.42f, 3, 0.75f, "#DDE4E1", false, true)
             };
@@ -258,14 +258,12 @@ namespace SortingStation.EditorTools
         }
 
         private static RouteSegmentDefinition Route(string id, string title, RouteSegmentType type, float length,
-            float weight, int gap, float density, string tint, bool sideRoad, bool rare)
+            float weight, int gap, float density, string tint, bool sideRoad, bool rare,
+            TrackFeature feature = TrackFeature.None)
         {
-            RouteSegmentDefinition route = GetOrCreate<RouteSegmentDefinition>($"{CabRouteRoot}/{id}.asset", out bool created);
-            if (created)
-            {
-                route.Configure(title, type, length, weight, gap, density, Hex(tint), sideRoad, rare);
-                EditorUtility.SetDirty(route);
-            }
+            RouteSegmentDefinition route = GetOrCreate<RouteSegmentDefinition>($"{CabRouteRoot}/{id}.asset", out _);
+            route.Configure(title, type, length, weight, gap, density, Hex(tint), sideRoad, rare, feature);
+            EditorUtility.SetDirty(route);
             return route;
         }
 

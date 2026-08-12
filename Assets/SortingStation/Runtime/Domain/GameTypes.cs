@@ -79,6 +79,14 @@ namespace SortingStation
         MountainTunnel
     }
 
+    public enum TrackFeature
+    {
+        None,
+        SwitchLeft,
+        SwitchRight,
+        LevelCrossing
+    }
+
     public enum CabSceneryLayer
     {
         Far,

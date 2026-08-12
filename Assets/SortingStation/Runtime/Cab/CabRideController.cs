@@ -137,6 +137,17 @@ namespace SortingStation
             if (tunnel) world.SetPreviewSegment(RouteSegmentType.MountainTunnel, 0.48f);
         }
 
+        public void ConfigureTrackPreview(RouteSegmentType type, float progress)
+        {
+            departureAuthorized = true;
+            vigilanceAlarm = false;
+            automaticStop = false;
+            if (dispatcherButton != null) dispatcherButton.gameObject.SetActive(false);
+            motion.SetThrottle(0.625f);
+            UpdateThrottleVisual();
+            world.SetPreviewSegment(type, progress);
+        }
+
         private void Build()
         {
             Canvas canvas;
@@ -1069,13 +1080,17 @@ namespace SortingStation
                 return;
             }
 
-            float motionMultiplier = services.Preferences.motionLevel == MotionLevel.Reduced ? 0.35f : 1f;
-            float phase = Time.unscaledTime * (4.1f + motion.Speed01 * 1.3f);
-            float amplitude = services.CabRide.CabinSwayPixels * motion.Speed01 * motionMultiplier;
+            float motionMultiplier = services.Preferences.motionLevel == MotionLevel.Reduced ? 0.32f : 1f;
+            float speedBlend = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.025f, 0.72f, motion.Speed01));
+            float phase = Time.unscaledTime * Mathf.Lerp(2.7f, 5.15f, motion.Speed01);
+            float secondaryPhase = Time.unscaledTime * Mathf.Lerp(1.35f, 2.25f, motion.Speed01) + 1.1f;
+            float amplitude = services.CabRide.CabinSwayPixels * speedBlend * motionMultiplier;
             Vector2 targetOffset = new Vector2(
-                Mathf.Sin(phase) * amplitude * 0.34f - motion.Acceleration01 * services.CabRide.CabinSwayPixels * 0.18f * motionMultiplier,
-                Mathf.Cos(phase * 1.37f) * amplitude * 0.12f);
-            float targetAngle = (Mathf.Sin(phase * 0.84f) * motion.Speed01 * 0.45f - motion.Acceleration01) *
+                (Mathf.Sin(phase) * 0.62f + Mathf.Sin(secondaryPhase) * 0.24f) * amplitude
+                    - motion.Acceleration01 * services.CabRide.CabinSwayPixels * 0.24f * motionMultiplier,
+                (Mathf.Cos(phase * 1.31f) * 0.20f + Mathf.Sin(secondaryPhase * 0.77f) * 0.10f) * amplitude);
+            float targetAngle = ((Mathf.Sin(phase * 0.83f) * 0.72f + Mathf.Sin(secondaryPhase) * 0.20f) * speedBlend
+                                 - motion.Acceleration01 * 0.85f) *
                 services.CabRide.CabinSwayRotationDegrees * motionMultiplier;
             float smooth = services.CabRide.CabinSwaySmoothSeconds;
             cabinSwayOffset = Vector2.SmoothDamp(cabinSwayOffset, targetOffset, ref cabinSwayVelocity,

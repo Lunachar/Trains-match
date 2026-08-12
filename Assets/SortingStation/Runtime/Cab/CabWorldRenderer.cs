@@ -44,9 +44,12 @@ namespace SortingStation
         private Image tunnelLeftWall;
         private Image tunnelRightWall;
         private Image tunnelCeiling;
-        private RectTransform leftRail;
-        private RectTransform rightRail;
-        private readonly List<RectTransform> sleepers = new List<RectTransform>(32);
+        private readonly List<RectTransform> leftRailSegments = new List<RectTransform>(36);
+        private readonly List<RectTransform> rightRailSegments = new List<RectTransform>(36);
+        private readonly List<RectTransform> sleepers = new List<RectTransform>(36);
+        private readonly List<RectTransform> featureLeftRailSegments = new List<RectTransform>(14);
+        private readonly List<RectTransform> featureRightRailSegments = new List<RectTransform>(14);
+        private RectTransform crossingDeck;
         private readonly List<RectTransform> roadMarkers = new List<RectTransform>(10);
         private readonly List<Image> tunnelLightPoints = new List<Image>(8);
         private readonly List<SceneryInstance> instances = new List<SceneryInstance>(40);
@@ -271,23 +274,30 @@ namespace SortingStation
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(viewport);
             trackBed = UiFactory.Panel("TrackBed", viewport, new Color(0.10f, 0.13f, 0.12f, 0f));
-            UiFactory.SetRect(trackBed, new Vector2(0.27f, -0.04f), new Vector2(0.73f, ride.Horizon + 0.01f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(trackBed, new Vector2(0.34f, -0.04f), new Vector2(0.66f, ride.Horizon + 0.01f), Vector2.zero, Vector2.zero);
             trackBed.GetComponent<Image>().raycastTarget = false;
-            leftRail = CreateLine("LeftRail", new Color(0.17f, 0.19f, 0.20f, 1f));
-            rightRail = CreateLine("RightRail", new Color(0.17f, 0.19f, 0.20f, 1f));
-            SetLine(leftRail, new Vector2(0.492f, ride.Horizon), new Vector2(0.285f, -0.04f), 8f);
-            SetLine(rightRail, new Vector2(0.508f, ride.Horizon), new Vector2(0.715f, -0.04f), 8f);
+            crossingDeck = UiFactory.Panel("LevelCrossingDeck", viewport, new Color(0.28f, 0.30f, 0.29f, 0f));
+            crossingDeck.anchorMin = crossingDeck.anchorMax = new Vector2(0.5f, 0.5f);
+            crossingDeck.pivot = new Vector2(0.5f, 0.5f);
+            crossingDeck.GetComponent<Image>().raycastTarget = false;
 
-            for (int i = 0; i < 32; i++)
+            for (int i = 0; i < 36; i++)
             {
+                leftRailSegments.Add(CreateLine("LeftRail_" + i, new Color(0.17f, 0.19f, 0.20f, 1f)));
+                rightRailSegments.Add(CreateLine("RightRail_" + i, new Color(0.17f, 0.19f, 0.20f, 1f)));
                 RectTransform sleeper = UiFactory.Panel("Sleeper_" + i, viewport, new Color(0.30f, 0.19f, 0.10f, 1f));
                 sleeper.anchorMin = sleeper.anchorMax = new Vector2(0.5f, 0.5f);
                 sleeper.pivot = new Vector2(0.5f, 0.5f);
                 sleeper.GetComponent<Image>().raycastTarget = false;
                 sleepers.Add(sleeper);
             }
-            leftRail.SetAsLastSibling();
-            rightRail.SetAsLastSibling();
+            for (int i = 0; i < leftRailSegments.Count; i++) leftRailSegments[i].SetAsLastSibling();
+            for (int i = 0; i < rightRailSegments.Count; i++) rightRailSegments[i].SetAsLastSibling();
+            for (int i = 0; i < 14; i++)
+            {
+                featureLeftRailSegments.Add(CreateLine("SwitchBranchLeft_" + i, new Color(0.22f, 0.24f, 0.24f, 0f)));
+                featureRightRailSegments.Add(CreateLine("SwitchBranchRight_" + i, new Color(0.22f, 0.24f, 0.24f, 0f)));
+            }
 
             for (int i = 0; i < 10; i++)
             {
@@ -308,24 +318,12 @@ namespace SortingStation
             return line;
         }
 
-        private void SetLine(RectTransform line, Vector2 top, Vector2 bottom, float width)
-        {
-            Vector2 size = viewport.rect.size;
-            Vector2 from = new Vector2((top.x - 0.5f) * size.x, (top.y - 0.5f) * size.y);
-            Vector2 to = new Vector2((bottom.x - 0.5f) * size.x, (bottom.y - 0.5f) * size.y);
-            Vector2 delta = to - from;
-            line.sizeDelta = new Vector2(delta.magnitude, width);
-            line.anchoredPosition = (from + to) * 0.5f;
-            line.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
-        }
-
         private void RefreshLayoutIfNeeded()
         {
             Vector2 size = viewport.rect.size;
             if ((size - lastViewportSize).sqrMagnitude < 1f) return;
             lastViewportSize = size;
-            SetLine(leftRail, new Vector2(0.492f, ride.Horizon), new Vector2(0.285f, -0.04f), 8f);
-            SetLine(rightRail, new Vector2(0.508f, ride.Horizon), new Vector2(0.715f, -0.04f), 8f);
+            UpdateTrack(trackPhase);
         }
 
         private void BuildTunnel()
@@ -528,15 +526,119 @@ namespace SortingStation
                 float phase = Mathf.Repeat(phaseOffset + (float)i / sleepers.Count, 1f);
                 float eased = phase * phase;
                 RectTransform sleeper = sleepers[i];
-                sleeper.anchoredPosition = new Vector2(0f,
-                    Mathf.Lerp((ride.Horizon - 0.5f) * size.y, -0.58f * size.y, eased));
-                sleeper.sizeDelta = new Vector2(Mathf.Lerp(45f, size.x * 0.72f, eased), Mathf.Lerp(3f, 20f, eased));
+                Vector2 center = TrackCenter(size, phase);
+                sleeper.anchoredPosition = center;
+                sleeper.sizeDelta = new Vector2(Mathf.Lerp(10f, size.x * 0.47f, eased), Mathf.Lerp(2f, 15f, eased));
+                // Sleepers stay level in the screen projection; only a separate switch
+                // may branch horizontally away from the otherwise straight main track.
+                sleeper.localRotation = Quaternion.identity;
                 Image image = sleeper.GetComponent<Image>();
                 Color color = image.color;
                 color.a = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.025f, 0.12f, phase)) *
                           (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.86f, 0.985f, phase)));
                 image.color = color;
             }
+
+            int count = Mathf.Min(leftRailSegments.Count, rightRailSegments.Count);
+            for (int i = 0; i < count; i++)
+            {
+                float nearPhase = (float)i / count;
+                float farPhase = (float)(i + 1) / count;
+                Vector2 nearCenter = TrackCenter(size, nearPhase);
+                Vector2 farCenter = TrackCenter(size, farPhase);
+                float nearHalfGauge = TrackHalfGauge(size, nearPhase);
+                float farHalfGauge = TrackHalfGauge(size, farPhase);
+                float width = Mathf.Lerp(2f, 6f, farPhase);
+                Vector2 nearGauge = Vector2.right * nearHalfGauge;
+                Vector2 farGauge = Vector2.right * farHalfGauge;
+                SetLinePixels(leftRailSegments[i], nearCenter - nearGauge, farCenter - farGauge, width);
+                SetLinePixels(rightRailSegments[i], nearCenter + nearGauge, farCenter + farGauge, width);
+            }
+            UpdateTrackFeature(size);
+        }
+
+        private Vector2 TrackCenter(Vector2 size, float phase)
+        {
+            float clamped = Mathf.Clamp01(phase);
+            float eased = clamped * clamped;
+            return new Vector2(0f,
+                Mathf.Lerp((ride.Horizon - 0.5f) * size.y, -0.52f * size.y, eased));
+        }
+
+        private float TrackHalfGauge(Vector2 size, float phase)
+        {
+            float perspective = Mathf.Pow(Mathf.Clamp01(phase), 1.35f);
+            return Mathf.Lerp(size.x * 0.0025f, size.x * 0.145f, perspective);
+        }
+
+        private void UpdateTrackFeature(Vector2 size)
+        {
+            TrackFeature feature = currentSegment != null ? currentSegment.Feature : TrackFeature.None;
+            float progress = currentSegment != null ? Mathf.Clamp01(segmentDistance / currentSegment.Length) : 0f;
+            float visibility = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Abs(progress - 0.55f) / 0.30f);
+            if (feature == TrackFeature.None || visibility <= 0.01f)
+            {
+                SetSwitchVisibility(Color.clear);
+                crossingDeck.GetComponent<Image>().color = Color.clear;
+                return;
+            }
+
+            if (feature == TrackFeature.LevelCrossing)
+            {
+                float travel = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.22f, 0.88f, progress));
+                float phase = Mathf.Lerp(0.08f, 0.96f, travel);
+                Vector2 center = TrackCenter(size, phase);
+                float width = Mathf.Lerp(80f, size.x * 0.64f, phase);
+                crossingDeck.anchoredPosition = center;
+                crossingDeck.sizeDelta = new Vector2(width, Mathf.Lerp(8f, 42f, phase));
+                crossingDeck.localRotation = Quaternion.identity;
+                crossingDeck.GetComponent<Image>().color = new Color(0.28f, 0.30f, 0.29f, visibility * 0.92f);
+                SetSwitchVisibility(Color.clear);
+                return;
+            }
+
+            crossingDeck.GetComponent<Image>().color = Color.clear;
+            float side = feature == TrackFeature.SwitchLeft ? -1f : 1f;
+            Color railColor = new Color(0.22f, 0.24f, 0.24f, visibility);
+            SetSwitchVisibility(railColor);
+            int count = Mathf.Min(featureLeftRailSegments.Count, featureRightRailSegments.Count);
+            for (int i = 0; i < count; i++)
+            {
+                float t0 = (float)i / count;
+                float t1 = (float)(i + 1) / count;
+                float phase0 = Mathf.Lerp(0.52f, 0.07f, t0);
+                float phase1 = Mathf.Lerp(0.52f, 0.07f, t1);
+                Vector2 center0 = SwitchCenter(size, phase0, t0, side);
+                Vector2 center1 = SwitchCenter(size, phase1, t1, side);
+                Vector2 gauge0 = Vector2.right * TrackHalfGauge(size, phase0) * 0.82f;
+                Vector2 gauge1 = Vector2.right * TrackHalfGauge(size, phase1) * 0.82f;
+                float railWidth = Mathf.Lerp(5f, 2f, t1);
+                SetLinePixels(featureLeftRailSegments[i], center0 - gauge0, center1 - gauge1, railWidth);
+                SetLinePixels(featureRightRailSegments[i], center0 + gauge0, center1 + gauge1, railWidth);
+            }
+        }
+
+        private Vector2 SwitchCenter(Vector2 size, float phase, float progress, float side)
+        {
+            float smooth = progress * progress * (3f - 2f * progress);
+            float perspective = Mathf.Lerp(1f, 0.55f, progress);
+            return TrackCenter(size, phase) + Vector2.right * (side * size.x * 0.12f * smooth * perspective);
+        }
+
+        private void SetSwitchVisibility(Color color)
+        {
+            for (int i = 0; i < featureLeftRailSegments.Count; i++)
+                featureLeftRailSegments[i].GetComponent<Image>().color = color;
+            for (int i = 0; i < featureRightRailSegments.Count; i++)
+                featureRightRailSegments[i].GetComponent<Image>().color = color;
+        }
+
+        private static void SetLinePixels(RectTransform line, Vector2 from, Vector2 to, float width)
+        {
+            Vector2 delta = to - from;
+            line.sizeDelta = new Vector2(delta.magnitude, width);
+            line.anchoredPosition = (from + to) * 0.5f;
+            line.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
         }
 
         private void UpdateRoad(float phaseOffset)

@@ -15,6 +15,10 @@ namespace SortingStation
         [SerializeField] private bool sideRoad;
         [SerializeField] private bool rare;
 
+        [Header("Track geometry")]
+        [Tooltip("Дополнительный железнодорожный объект внутри сегмента.")]
+        [SerializeField] private TrackFeature trackFeature;
+
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? type.ToString() : displayName;
         public RouteSegmentType Type => type;
         public float Length => Mathf.Max(30f, length);
@@ -24,10 +28,12 @@ namespace SortingStation
         public Color AmbientTint => ambientTint;
         public bool SideRoad => sideRoad;
         public bool Rare => rare;
+        public TrackFeature Feature => trackFeature;
 
 #if UNITY_EDITOR
         public void Configure(string title, RouteSegmentType segmentType, float segmentLength, float selectionWeight,
-            int gap, float density, Color tint, bool hasSideRoad, bool isRare)
+            int gap, float density, Color tint, bool hasSideRoad, bool isRare,
+            TrackFeature feature = TrackFeature.None)
         {
             displayName = title;
             type = segmentType;
@@ -38,6 +44,7 @@ namespace SortingStation
             ambientTint = tint;
             sideRoad = hasSideRoad;
             rare = isRare;
+            trackFeature = feature;
         }
 #endif
     }

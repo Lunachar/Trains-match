@@ -21,3 +21,4 @@ MonoBehaviour:
   ambientTint: {r: 0.8666667, g: 0.89411765, b: 0.88235295, a: 1}
   sideRoad: 0
   rare: 1
+  trackFeature: 0

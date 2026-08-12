@@ -35,6 +35,11 @@ namespace SortingStation
                 yield return CaptureDeparturePreview();
                 yield break;
             }
+            if (Array.Exists(Environment.GetCommandLineArgs(), arg => string.Equals(arg, "-trackPreview", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return CaptureTrackPreview();
+                yield break;
+            }
 
             yield return WaitForScene(SceneNames.MainMenu);
             yield return Capture("01-main-menu.png");
@@ -94,6 +99,27 @@ namespace SortingStation
             yield return new WaitForSecondsRealtime(0.8f);
             yield return Capture("departure-ready.png", 1600, 1000);
             Debug.Log("DEPARTURE_PREVIEW_COMPLETE=" + outputDirectory);
+            yield return new WaitForSecondsRealtime(0.2f);
+            Application.Quit();
+        }
+
+        private IEnumerator CaptureTrackPreview()
+        {
+            yield return WaitForScene(SceneNames.MainMenu);
+            AppServices.Instance.Session.Select(GameMode.CabRide, 2);
+            SceneManager.LoadScene(SceneNames.CabRide);
+            yield return WaitForScene(SceneNames.CabRide);
+            CabRideController cab = FindObjectOfType<CabRideController>();
+            if (cab != null) cab.ConfigureTrackPreview(RouteSegmentType.Forest, 0.48f);
+            yield return new WaitForSecondsRealtime(1.8f);
+            yield return Capture("01-straight-track.png", 1600, 1000);
+            if (cab != null) cab.ConfigureTrackPreview(RouteSegmentType.Village, 0.55f);
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return Capture("02-track-switch.png", 1600, 1000);
+            if (cab != null) cab.ConfigureTrackPreview(RouteSegmentType.Road, 0.55f);
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return Capture("03-level-crossing.png", 1600, 1000);
+            Debug.Log("TRACK_PREVIEW_COMPLETE=" + outputDirectory);
             yield return new WaitForSecondsRealtime(0.2f);
             Application.Quit();
         }

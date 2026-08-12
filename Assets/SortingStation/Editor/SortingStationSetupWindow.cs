@@ -5,16 +5,10 @@ using UnityEngine;
 
 namespace SortingStation.EditorTools
 {
+    /// <summary>One place for the project's commonly edited game data.</summary>
     public sealed class SortingStationSetupWindow : EditorWindow
     {
-        private enum Section
-        {
-            General,
-            Cab,
-            Environment,
-            Audio,
-            Levels
-        }
+        private enum Section { General, Cab, Environment, Audio, Levels }
 
         private readonly Dictionary<int, UnityEditor.Editor> editors = new Dictionary<int, UnityEditor.Editor>();
         private readonly List<string> validationIssues = new List<string>();
@@ -30,10 +24,7 @@ namespace SortingStation.EditorTools
             window.Show();
         }
 
-        private void OnDisable()
-        {
-            ClearEditors();
-        }
+        private void OnDisable() => ClearEditors();
 
         private void OnGUI()
         {
@@ -50,27 +41,29 @@ namespace SortingStation.EditorTools
                     DrawAsset("Основная графика", Load<VisualCatalog>("VisualCatalog"));
                     break;
                 case Section.Cab:
-                    EditorGUILayout.HelpBox("Здесь настраиваются скорость, плавность, свет, брелок, клавиши, изображения и координаты всех восьми приборов.", MessageType.Info);
+                    EditorGUILayout.HelpBox(
+                        "Скорость, плавность, покачивание кабины, свет, брелок, клавиши, изображения и зоны приборов.",
+                        MessageType.Info);
                     DrawAsset("Живая кабина", Load<CabRideDefinition>("CabRideDefinition"));
                     break;
                 case Section.Environment:
-                    EditorGUILayout.HelpBox("Перетаскивайте новые спрайты в каталог, выбирайте поддерживаемые типы маршрута и регулируйте размеры, слои, плотность, вес и запрет повторов.", MessageType.Info);
+                    EditorGUILayout.HelpBox(
+                        "У каждого сегмента можно менять длину, вероятность, плотность окружения и железнодорожный объект.",
+                        MessageType.Info);
                     DrawAsset("Каталог окружения", Load<CabSceneryCatalog>("CabSceneryCatalog"));
                     foreach (RouteSegmentDefinition route in FindAssets<RouteSegmentDefinition>("Assets/SortingStation/Data/CabRoutes"))
-                    {
                         DrawAsset("Сегмент: " + route.DisplayName, route);
-                    }
                     break;
                 case Section.Audio:
-                    EditorGUILayout.HelpBox("Все поля поддерживают обычное перетаскивание AudioClip из окна Project. Добавьте несколько файлов в плейлист радио или в variants нужного события.", MessageType.Info);
+                    EditorGUILayout.HelpBox(
+                        "Перетащите AudioClip в плейлист радио или в нужное звуковое событие. Радио всегда воспроизводится с pitch = 1.",
+                        MessageType.Info);
                     DrawAsset("Музыка, радио, рельсы и эффекты", Load<AudioCatalog>("AudioCatalog"));
                     break;
                 case Section.Levels:
                     DrawAsset("Каталог режимов и уровней", Load<GameCatalog>("GameCatalog"));
                     foreach (LevelDefinition level in FindAssets<LevelDefinition>("Assets/SortingStation/Data/Levels"))
-                    {
                         DrawAsset(level.Title + " — " + level.OptionCount, level);
-                    }
                     break;
             }
             EditorGUILayout.EndScrollView();
@@ -80,7 +73,9 @@ namespace SortingStation.EditorTools
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.LabelField("Поезда: Живая кабина", new GUIStyle(EditorStyles.boldLabel) { fontSize = 18 });
-            EditorGUILayout.LabelField("Все игровые каталоги в одном окне. Изменения сохраняются как обычные Unity-ассеты.", EditorStyles.wordWrappedMiniLabel);
+            EditorGUILayout.LabelField(
+                "Все основные игровые каталоги в одном окне. Изменения сохраняются как обычные Unity-ассеты.",
+                EditorStyles.wordWrappedMiniLabel);
             EditorGUILayout.Space(4f);
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -89,7 +84,7 @@ namespace SortingStation.EditorTools
                     AssetDatabase.SaveAssets();
                     ShowNotification(new GUIContent("Настройки сохранены"));
                 }
-                if (GUILayout.Button("Дополнить отсутствующие данные", GUILayout.Height(30f)))
+                if (GUILayout.Button("Дополнить данные", GUILayout.Height(30f)))
                 {
                     ProjectBootstrapper.BuildProject();
                     ClearEditors();
@@ -97,13 +92,14 @@ namespace SortingStation.EditorTools
                 }
                 if (GUILayout.Button("Проверить проект", GUILayout.Height(30f))) RunValidation();
             }
+
             if (validationRun)
             {
-                MessageType type = validationIssues.Count == 0 ? MessageType.Info : MessageType.Warning;
-                string message = validationIssues.Count == 0
+                bool valid = validationIssues.Count == 0;
+                string message = valid
                     ? "Проверка пройдена: обязательные ресурсы и параметры назначены."
                     : "Найдено проблем: " + validationIssues.Count + "\n• " + string.Join("\n• ", validationIssues.Take(8));
-                EditorGUILayout.HelpBox(message, type);
+                EditorGUILayout.HelpBox(message, valid ? MessageType.Info : MessageType.Warning);
             }
             EditorGUILayout.EndVertical();
         }
@@ -115,13 +111,12 @@ namespace SortingStation.EditorTools
             {
                 EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
                 using (new EditorGUI.DisabledScope(asset == null))
-                {
                     if (GUILayout.Button("Показать", GUILayout.Width(78f))) EditorGUIUtility.PingObject(asset);
-                }
             }
+
             if (asset == null)
             {
-                EditorGUILayout.HelpBox("Ассет отсутствует. Нажмите «Дополнить отсутствующие данные».", MessageType.Warning);
+                EditorGUILayout.HelpBox("Ассет отсутствует. Нажмите «Дополнить данные».", MessageType.Warning);
                 EditorGUILayout.EndVertical();
                 return;
             }
@@ -148,24 +143,18 @@ namespace SortingStation.EditorTools
         private void ClearEditors()
         {
             foreach (UnityEditor.Editor editor in editors.Values)
-            {
                 if (editor != null) DestroyImmediate(editor);
-            }
             editors.Clear();
         }
 
-        private static T Load<T>(string name) where T : Object
-        {
-            return Resources.Load<T>("Configuration/" + name);
-        }
+        private static T Load<T>(string name) where T : Object =>
+            Resources.Load<T>("Configuration/" + name);
 
-        private static IEnumerable<T> FindAssets<T>(string folder) where T : Object
-        {
-            return AssetDatabase.FindAssets("t:" + typeof(T).Name, new[] { folder })
+        private static IEnumerable<T> FindAssets<T>(string folder) where T : Object =>
+            AssetDatabase.FindAssets("t:" + typeof(T).Name, new[] { folder })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Select(AssetDatabase.LoadAssetAtPath<T>)
                 .Where(asset => asset != null)
                 .OrderBy(asset => asset.name);
-        }
     }
 }
