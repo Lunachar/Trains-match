@@ -524,11 +524,12 @@ namespace SortingStation
             for (int i = 0; i < sleepers.Count; i++)
             {
                 float phase = Mathf.Repeat(phaseOffset + (float)i / sleepers.Count, 1f);
-                float eased = phase * phase;
+                float depth = TrackPerspectiveDepth(phase);
                 RectTransform sleeper = sleepers[i];
                 Vector2 center = TrackCenter(size, phase);
                 sleeper.anchoredPosition = center;
-                sleeper.sizeDelta = new Vector2(Mathf.Lerp(10f, size.x * 0.47f, eased), Mathf.Lerp(2f, 15f, eased));
+                sleeper.sizeDelta = new Vector2(Mathf.Max(1f, size.x * 0.47f * depth),
+                    Mathf.Lerp(1f, 15f, depth));
                 // Sleepers stay level in the screen projection; only a separate switch
                 // may branch horizontally away from the otherwise straight main track.
                 sleeper.localRotation = Quaternion.identity;
@@ -559,16 +560,23 @@ namespace SortingStation
 
         private Vector2 TrackCenter(Vector2 size, float phase)
         {
-            float clamped = Mathf.Clamp01(phase);
-            float eased = clamped * clamped;
+            float depth = TrackPerspectiveDepth(phase);
             return new Vector2(0f,
-                Mathf.Lerp((ride.Horizon - 0.5f) * size.y, -0.52f * size.y, eased));
+                Mathf.Lerp((ride.Horizon - 0.5f) * size.y, -0.52f * size.y, depth));
         }
 
         private float TrackHalfGauge(Vector2 size, float phase)
         {
-            float perspective = Mathf.Pow(Mathf.Clamp01(phase), 1.35f);
-            return Mathf.Lerp(size.x * 0.0025f, size.x * 0.145f, perspective);
+            // Gauge and vertical position use exactly the same perspective depth.
+            // Therefore every sampled point lies on one straight line from the cab
+            // to the single vanishing point on the horizon.
+            return size.x * 0.145f * TrackPerspectiveDepth(phase);
+        }
+
+        private static float TrackPerspectiveDepth(float phase)
+        {
+            float clamped = Mathf.Clamp01(phase);
+            return clamped * clamped;
         }
 
         private void UpdateTrackFeature(Vector2 size)

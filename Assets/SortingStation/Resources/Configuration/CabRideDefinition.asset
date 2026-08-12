@@ -69,7 +69,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   worldUnitsPerSecond: 28
   routeSeed: 20260805
-  horizon: 0.54
+  horizon: 0.63
   perspectiveStrength: 1.15
   keychainAccelerationDegrees: 8
   keychainRailDegrees: 2.2

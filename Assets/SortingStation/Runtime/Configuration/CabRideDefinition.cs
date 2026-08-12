@@ -23,7 +23,7 @@ namespace SortingStation
         [Header("World")]
         [SerializeField] [Min(1f)] private float worldUnitsPerSecond = 28f;
         [SerializeField] private int routeSeed = 20260805;
-        [SerializeField] [Range(0.25f, 0.75f)] private float horizon = 0.54f;
+        [SerializeField] [Range(0.25f, 0.75f)] private float horizon = 0.63f;
         [SerializeField] [Range(0.1f, 2f)] private float perspectiveStrength = 1.15f;
 
         [Header("Cab animation")]
@@ -125,7 +125,7 @@ namespace SortingStation
             brakingCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             worldUnitsPerSecond = 28f;
             routeSeed = 20260805;
-            horizon = 0.54f;
+            horizon = 0.63f;
             perspectiveStrength = 1.15f;
             keychainAccelerationDegrees = 8f;
             keychainRailDegrees = 2.2f;
