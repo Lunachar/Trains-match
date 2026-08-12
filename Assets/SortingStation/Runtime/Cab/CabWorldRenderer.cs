@@ -31,6 +31,8 @@ namespace SortingStation
         private Image groundPrimary;
         private Image groundSecondary;
         private Image distantBand;
+        private Image distantMountainsLeft;
+        private Image distantMountainsRight;
         private Image forestBand;
         private Image shrubBand;
         private Image townBand;
@@ -65,6 +67,7 @@ namespace SortingStation
         private int activeSeason;
         private int incomingSeason;
         private float seasonDistance;
+        private int nextScenerySide = -1;
 
         public event Action<RouteSegmentDefinition> SegmentChanged;
         public float TunnelBlend { get; private set; }
@@ -171,6 +174,7 @@ namespace SortingStation
                 if (segments[i] == null || segments[i].Type != type) continue;
                 ApplySegment(segments[i], true);
                 segmentDistance = segments[i].Length * Mathf.Clamp01(progress);
+                RespawnPreviewScenery();
                 TunnelBlend = type == RouteSegmentType.MountainTunnel ? 0.85f : 0f;
                 UpdateTunnel(0f);
                 UpdateRoad(trackPhase);
@@ -201,16 +205,23 @@ namespace SortingStation
         private void BuildLayeredBackdrop()
         {
             Sprite[] grounds = catalog != null ? catalog.SeasonalGrounds : Array.Empty<Sprite>();
-            groundPrimary = CreateBackdrop("GroundPrimary", grounds.Length > 0 ? grounds[0] : null,
-                new Vector2(-0.03f, -0.06f), new Vector2(1.03f, 0.70f), Color.white);
-            groundSecondary = CreateBackdrop("GroundSecondary", grounds.Length > 1 ? grounds[1] : null,
-                new Vector2(-0.03f, -0.06f), new Vector2(1.03f, 0.70f), Color.clear);
-            distantBand = CreateBackdrop("DistantLandscape", catalog != null ? catalog.DistantBackdrop : null,
+            Sprite uniformGround = catalog != null ? catalog.UniformGround : null;
+            groundPrimary = CreateBackdrop("GroundPrimary", uniformGround != null ? uniformGround : grounds.Length > 0 ? grounds[0] : null,
+                new Vector2(-0.03f, -0.06f), new Vector2(1.03f, 0.64f), Color.white);
+            groundSecondary = CreateBackdrop("GroundSecondary", uniformGround == null && grounds.Length > 1 ? grounds[1] : null,
+                new Vector2(-0.03f, -0.06f), new Vector2(1.03f, 0.64f), Color.clear);
+            bool hasSplitMountains = catalog != null &&
+                (catalog.DistantMountainsLeft != null || catalog.DistantMountainsRight != null);
+            distantBand = CreateBackdrop("DistantLandscape", hasSplitMountains ? null : catalog != null ? catalog.DistantBackdrop : null,
                 new Vector2(-0.04f, 0.38f), new Vector2(1.04f, 0.75f), new Color(1f, 1f, 1f, 0.86f));
+            distantMountainsLeft = CreateBackdrop("DistantMountainsLeft", catalog != null ? catalog.DistantMountainsLeft : null,
+                new Vector2(-0.12f, 0.04f), new Vector2(0.64f, 0.94f), new Color(0.88f, 0.94f, 1f, 0.88f));
+            distantMountainsRight = CreateBackdrop("DistantMountainsRight", catalog != null ? catalog.DistantMountainsRight : null,
+                new Vector2(0.36f, -0.15f), new Vector2(1.12f, 1.11f), new Color(0.88f, 0.94f, 1f, 0.88f));
             forestBand = CreateBackdrop("ForestBand", catalog != null ? catalog.ForestBand : null,
-                new Vector2(-0.07f, 0.36f), new Vector2(1.07f, 0.70f), new Color(1f, 1f, 1f, 0.72f));
+                new Vector2(-0.07f, 0.34f), new Vector2(1.07f, 0.61f), new Color(1f, 1f, 1f, hasSplitMountains ? 0.38f : 0.72f));
             shrubBand = CreateBackdrop("ShrubBand", catalog != null ? catalog.ShrubBand : null,
-                new Vector2(-0.08f, 0.29f), new Vector2(1.08f, 0.62f), new Color(1f, 1f, 1f, 0.64f));
+                new Vector2(-0.08f, 0.27f), new Vector2(1.08f, 0.55f), new Color(1f, 1f, 1f, hasSplitMountains ? 0.42f : 0.64f));
             townBand = CreateBackdrop("TownBand", catalog != null ? catalog.TownBand : null,
                 new Vector2(-0.05f, 0.38f), new Vector2(1.05f, 0.71f), Color.clear);
             weatherOverlay = CreateBackdrop("Weather", null, Vector2.zero, Vector2.one, Color.clear);
@@ -229,13 +240,14 @@ namespace SortingStation
         {
             if (catalog == null) return;
             Sprite[] grounds = catalog.SeasonalGrounds;
-            if (grounds.Length > 0 && totalDistance - seasonDistance >= catalog.SeasonCycleDistance)
+            bool uniformGround = catalog.UniformGround != null;
+            if (!uniformGround && grounds.Length > 0 && totalDistance - seasonDistance >= catalog.SeasonCycleDistance)
             {
                 seasonDistance = totalDistance;
                 incomingSeason = (activeSeason + 1) % grounds.Length;
                 groundSecondary.sprite = grounds[incomingSeason];
             }
-            float seasonFade = grounds.Length > 1 ? Mathf.Clamp01((totalDistance - seasonDistance) / 85f) : 0f;
+            float seasonFade = !uniformGround && grounds.Length > 1 ? Mathf.Clamp01((totalDistance - seasonDistance) / 85f) : 0f;
             if (incomingSeason != activeSeason && seasonFade >= 1f)
             {
                 activeSeason = incomingSeason;
@@ -251,6 +263,10 @@ namespace SortingStation
             if (groundPrimary != null) groundPrimary.rectTransform.anchoredPosition = new Vector2(pan * 0.22f, Mathf.Sin(totalDistance * 0.011f) * 2f * decorativeMotion);
             if (groundSecondary != null) groundSecondary.rectTransform.anchoredPosition = groundPrimary != null ? groundPrimary.rectTransform.anchoredPosition : Vector2.zero;
             if (distantBand != null) distantBand.rectTransform.anchoredPosition = new Vector2(pan * 0.12f, 0f);
+            float mountainCycle = 0.5f + 0.5f * Mathf.Sin(totalDistance / catalog.MountainSeparationDistance);
+            float mountainOffset = mountainCycle * catalog.MountainSeparationPixels * decorativeMotion;
+            if (distantMountainsLeft != null) distantMountainsLeft.rectTransform.anchoredPosition = new Vector2(-mountainOffset, 0f);
+            if (distantMountainsRight != null) distantMountainsRight.rectTransform.anchoredPosition = new Vector2(mountainOffset, 0f);
             if (forestBand != null) forestBand.rectTransform.anchoredPosition = new Vector2(pan * 0.42f, 0f);
             if (shrubBand != null) shrubBand.rectTransform.anchoredPosition = new Vector2(pan * 0.72f, 0f);
             if (townBand != null)
@@ -413,6 +429,17 @@ namespace SortingStation
             }
         }
 
+        private void RespawnPreviewScenery()
+        {
+            for (int i = 0; i < instances.Count; i++)
+            {
+                instances[i].active = false;
+                instances[i].rect.gameObject.SetActive(false);
+            }
+            nextScenerySide = -1;
+            PrewarmScenery();
+        }
+
         private void AdvanceScenery(float distanceDelta)
         {
             for (int i = 0; i < instances.Count; i++)
@@ -454,7 +481,15 @@ namespace SortingStation
             }
             instance.definition = definition;
             instance.depth = Mathf.Clamp01(depth);
-            instance.side = definition.centered ? 0f : (random.NextDouble() < 0.5d ? -1f : 1f) * Mathf.Lerp(0.82f, 1.12f, (float)random.NextDouble());
+            if (definition.centered)
+            {
+                instance.side = 0f;
+            }
+            else
+            {
+                instance.side = nextScenerySide * Mathf.Lerp(0.88f, 1.16f, (float)random.NextDouble());
+                nextScenerySide = -nextScenerySide;
+            }
             instance.sizeScale = Mathf.Lerp(definition.scaleRange.x, definition.scaleRange.y, (float)random.NextDouble());
             instance.active = true;
             instance.image.sprite = definition.sprite;
@@ -478,10 +513,23 @@ namespace SortingStation
                 if (entries[i] != null && entries[i].sprite != null && entries[i].poolSpawn && entries[i].Supports(type)) eligible++;
             }
             if (eligible == 0) return null;
-            int pick = random.Next(eligible);
+            // Prefer the new high-detail cut-outs while retaining the original atlas
+            // as variety and as a lightweight fallback.
+            bool preferRealistic = random.NextDouble() < 0.72d;
+            int preferred = 0;
+            if (preferRealistic)
+            {
+                for (int i = 0; i < entries.Length; i++)
+                {
+                    if (entries[i] != null && entries[i].sprite != null && entries[i].poolSpawn &&
+                        entries[i].Supports(type) && entries[i].id.StartsWith("real_", StringComparison.Ordinal)) preferred++;
+                }
+            }
+            int pick = random.Next(preferred > 0 ? preferred : eligible);
             for (int i = 0; i < entries.Length; i++)
             {
                 if (entries[i] == null || entries[i].sprite == null || !entries[i].poolSpawn || !entries[i].Supports(type)) continue;
+                if (preferred > 0 && !entries[i].id.StartsWith("real_", StringComparison.Ordinal)) continue;
                 if (pick-- == 0) return entries[i];
             }
             return entries[0];

@@ -28,12 +28,18 @@ namespace SortingStation
 
         [Header("Layered backdrop")]
         [SerializeField] private Sprite[] seasonalGrounds = Array.Empty<Sprite>();
+        [Tooltip("Optional homogeneous grass texture used instead of the seasonal atlas.")]
+        [SerializeField] private Sprite uniformGround;
         [SerializeField] private Sprite forestBand;
         [SerializeField] private Sprite shrubBand;
         [SerializeField] private Sprite distantBackdrop;
+        [SerializeField] private Sprite distantMountainsLeft;
+        [SerializeField] private Sprite distantMountainsRight;
         [SerializeField] private Sprite townBand;
-        [SerializeField] [Range(0.5f, 3f)] private float forestDensityMultiplier = 1.85f;
+        [SerializeField] [Range(0.5f, 4f)] private float forestDensityMultiplier = 2.75f;
         [SerializeField] [Range(0.5f, 3f)] private float townDensityMultiplier = 2.15f;
+        [SerializeField] [Range(0f, 80f)] private float mountainSeparationPixels = 34f;
+        [SerializeField] [Min(120f)] private float mountainSeparationDistance = 1500f;
         [SerializeField] [Min(120f)] private float seasonCycleDistance = 900f;
         [SerializeField] [Range(0.02f, 0.45f)] private float weatherOverlayAlpha = 0.16f;
 
@@ -50,14 +56,19 @@ namespace SortingStation
         public CabSceneryDefinition[] Scenery => scenery ?? Array.Empty<CabSceneryDefinition>();
         public int PoolSize => Mathf.Clamp(poolSize, 16, 96);
         public Sprite[] SeasonalGrounds => seasonalGrounds ?? Array.Empty<Sprite>();
+        public Sprite UniformGround => uniformGround;
         public Sprite ForestBand => forestBand;
         public Sprite ShrubBand => shrubBand;
         public Sprite DistantBackdrop => distantBackdrop;
+        public Sprite DistantMountainsLeft => distantMountainsLeft;
+        public Sprite DistantMountainsRight => distantMountainsRight;
         public Sprite TownBand => townBand;
-        public float ForestDensityMultiplier => Mathf.Clamp(forestDensityMultiplier, 0.5f, 3f);
+        public float ForestDensityMultiplier => Mathf.Clamp(forestDensityMultiplier, 0.5f, 4f);
         public float TownDensityMultiplier => Mathf.Clamp(townDensityMultiplier, 0.5f, 3f);
         public float SeasonCycleDistance => Mathf.Max(120f, seasonCycleDistance);
         public float WeatherOverlayAlpha => Mathf.Clamp(weatherOverlayAlpha, 0.02f, 0.45f);
+        public float MountainSeparationPixels => Mathf.Clamp(mountainSeparationPixels, 0f, 80f);
+        public float MountainSeparationDistance => Mathf.Max(120f, mountainSeparationDistance);
 
         public CabSceneryDefinition Find(string id)
         {
@@ -139,6 +150,15 @@ namespace SortingStation
             if (shrubBand == null) shrubBand = shrubs;
             if (distantBackdrop == null) distantBackdrop = distant;
             if (townBand == null) townBand = town;
+        }
+
+        public void ConfigureRealisticBackdropIfMissing(Sprite grass, Sprite mountainsLeft, Sprite mountainsRight)
+        {
+            if (uniformGround == null) uniformGround = grass;
+            if (distantMountainsLeft == null) distantMountainsLeft = mountainsLeft;
+            if (distantMountainsRight == null) distantMountainsRight = mountainsRight;
+            if (mountainSeparationPixels <= 0f) mountainSeparationPixels = 34f;
+            if (mountainSeparationDistance <= 0f) mountainSeparationDistance = 1500f;
         }
 
         public void ConfigureRadioArtworkIfMissing(Sprite previous, Sprite play, Sprite next, Sprite playlist)

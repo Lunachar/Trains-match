@@ -49,6 +49,7 @@ namespace SortingStation
         private float keychainAngularVelocity;
         private float keychainPointerX;
         private bool keychainPointerActive;
+        private float keychainRailPhase;
         private float headlightAlpha;
         private float cabinAlpha;
         private bool headlights;
@@ -254,7 +255,7 @@ namespace SortingStation
             GameObject rootObject = new GameObject("Keychain", typeof(RectTransform));
             rootObject.transform.SetParent(cabInterior, false);
             keychain = rootObject.GetComponent<RectTransform>();
-            keychain.anchorMin = keychain.anchorMax = new Vector2(0.535f, 0.535f);
+            keychain.anchorMin = keychain.anchorMax = new Vector2(0.535f, 0.615f);
             keychain.pivot = new Vector2(0.5f, 1f);
             keychain.sizeDelta = new Vector2(124f, 168f);
 
@@ -370,12 +371,14 @@ namespace SortingStation
             {
                 CabControlBinding binding = bindings[i];
                 if (binding.action == CabControlAction.Radio) continue;
-                Color idle = WithAlpha(theme.PanelColor, 0.48f);
+                // The whole rectangle remains a large accessible hit target, while the
+                // visible control is a compact instrument fitted into the photographed panel.
+                Color idle = new Color(0.035f, 0.045f, 0.050f, 0.68f);
                 Color selected = WithAlpha(theme.SelectedColor, 0.82f);
                 if (binding.action == CabControlAction.Brake)
                 {
-                    idle = WithAlpha(theme.BrakeColor, 0.72f);
-                    selected = WithAlpha(theme.AccentColor, 0.88f);
+                    idle = new Color(0.16f, 0.055f, 0.045f, 0.72f);
+                    selected = WithAlpha(theme.BrakeColor, 0.86f);
                 }
                 AccessibleButton button = UiFactory.Button(binding.action.ToString(), cabInterior, focusGroup,
                     InitialControlLabel(binding, binding.artwork != null), idle, selected,
@@ -396,10 +399,17 @@ namespace SortingStation
                 statePlate.transform.SetAsFirstSibling();
                 bool lever = binding.action == CabControlAction.Throttle || binding.action == CabControlAction.Brake;
                 bool hasArtwork = binding.artwork != null;
-                Vector2 plateMin = new Vector2(0.04f, 0.04f);
-                Vector2 plateMax = hasArtwork ? new Vector2(0.96f, 0.96f)
-                    : lever ? new Vector2(0.96f, 0.47f) : new Vector2(0.96f, 0.80f);
+                Vector2 plateMin = hasArtwork ? new Vector2(0.19f, 0.10f) : new Vector2(0.08f, 0.05f);
+                Vector2 plateMax = hasArtwork ? new Vector2(0.81f, 0.90f)
+                    : lever ? new Vector2(0.92f, 0.47f) : new Vector2(0.92f, 0.80f);
                 UiFactory.SetRect(statePlate.rectTransform, plateMin, plateMax, Vector2.zero, Vector2.zero);
+                Outline bezel = statePlate.gameObject.AddComponent<Outline>();
+                bezel.effectColor = new Color(0.68f, 0.72f, 0.70f, 0.55f);
+                bezel.effectDistance = new Vector2(2f, -2f);
+                bezel.useGraphicAlpha = false;
+                Shadow plateShadow = statePlate.gameObject.AddComponent<Shadow>();
+                plateShadow.effectColor = new Color(0f, 0f, 0f, 0.55f);
+                plateShadow.effectDistance = new Vector2(0f, -4f);
                 Vector2 labelMin = hasArtwork ? new Vector2(0.06f, 0.04f) : plateMin;
                 Vector2 labelMax = hasArtwork ? new Vector2(0.94f, lever ? 0.34f : 0.42f) : plateMax;
                 UiFactory.SetRect(button.Label.rectTransform, labelMin, labelMax,
@@ -409,13 +419,17 @@ namespace SortingStation
                 if (hasArtwork)
                 {
                     Image artwork = UiFactory.Image("Artwork", button.transform, binding.artwork,
-                        new Color(0.72f, 0.78f, 0.82f, 0.76f), true);
+                        Color.white, true);
                     Vector2 artworkHalf = binding.artworkSize * 0.5f;
                     UiFactory.SetRect(artwork.rectTransform, binding.artworkCenter - artworkHalf,
                         binding.artworkCenter + artworkHalf, Vector2.zero, Vector2.zero);
                     artwork.raycastTarget = false;
                     artwork.transform.SetSiblingIndex(1);
                     controlArtwork[binding.action] = artwork;
+                    button.Label.color = new Color(0.88f, 0.96f, 1f, 0.96f);
+                    Shadow labelShadow = button.Label.gameObject.AddComponent<Shadow>();
+                    labelShadow.effectColor = new Color(0f, 0f, 0f, 0.92f);
+                    labelShadow.effectDistance = new Vector2(1.5f, -1.5f);
                 }
                 controls[binding.action] = button;
             }
@@ -1114,7 +1128,9 @@ namespace SortingStation
             if (motionMultiplier > 0f)
             {
                 float accelerationSwing = -motion.Acceleration01 * services.CabRide.KeychainAccelerationDegrees;
-                float railSwing = Mathf.Sin(Time.unscaledTime * 5.2f) * motion.Speed01 * services.CabRide.KeychainRailDegrees;
+                float railFrequency = Mathf.Lerp(2.2f, 8.2f, motion.Speed01);
+                keychainRailPhase = Mathf.Repeat(keychainRailPhase + railFrequency * deltaTime, Mathf.PI * 2f);
+                float railSwing = Mathf.Sin(keychainRailPhase) * motion.Speed01 * services.CabRide.KeychainRailDegrees;
                 target = (accelerationSwing + railSwing) * motionMultiplier;
             }
             float dt = Mathf.Clamp(deltaTime, 0f, 0.1f);
@@ -1159,7 +1175,7 @@ namespace SortingStation
         private void UpdateArtworkState(CabControlAction action, bool active, float leverValue = -1f)
         {
             if (!controlArtwork.TryGetValue(action, out Image artwork) || artwork == null) return;
-            artwork.color = active ? Color.white : new Color(0.72f, 0.78f, 0.82f, 0.76f);
+            artwork.color = active ? Color.white : new Color(0.88f, 0.91f, 0.92f, 0.92f);
             artwork.rectTransform.localScale = active ? Vector3.one * 0.94f : Vector3.one;
             if (leverValue >= 0f && (action == CabControlAction.Throttle || action == CabControlAction.Brake))
             {

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff11a5a7f9bf2b9449c48adf8f06281c, type: 3}
   m_Name: CabRideDefinition
   m_EditorClassIdentifier: 
-  configurationVersion: 7
+  configurationVersion: 9
   maximumSpeedKph: 90
   accelerationSeconds: 7
   serviceBrakeSeconds: 4.5
@@ -161,7 +161,7 @@ MonoBehaviour:
     artworkCenter: {x: 0.5, y: 0.64}
     artworkSize: {x: 0.76, y: 0.48}
     shortcut: 32
-    normalizedCenter: {x: 0.2, y: 0.385}
-    normalizedSize: {x: 0.09, y: 0.14}
+    normalizedCenter: {x: 0.18, y: 0.315}
+    normalizedSize: {x: 0.09, y: 0.12}
     momentary: 0
   layers: []

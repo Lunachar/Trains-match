@@ -7,7 +7,7 @@ namespace SortingStation
     [CreateAssetMenu(menuName = "Sorting Station/Cab Ride", fileName = "CabRideDefinition")]
     public sealed class CabRideDefinition : ScriptableObject
     {
-        private const int CurrentConfigurationVersion = 7;
+        private const int CurrentConfigurationVersion = 9;
 
         [SerializeField, HideInInspector] private int configurationVersion;
         [Header("Motion")]
@@ -86,7 +86,7 @@ namespace SortingStation
                 Binding(CabControlAction.Bell, "Звонок", "♪", Key.B, 0.335f, 0.255f, 0.095f, 0.13f, true),
                 Binding(CabControlAction.Throttle, "Тяга", "↕", Key.None, 0.548f, 0.285f, 0.115f, 0.19f, false),
                 Binding(CabControlAction.Brake, "Тормоз", "■", Key.None, 0.674f, 0.285f, 0.115f, 0.19f, true),
-                Binding(CabControlAction.Radio, "Радио", "♫", Key.R, 0.20f, 0.385f, 0.09f, 0.14f, false)
+                Binding(CabControlAction.Radio, "Радио", "♫", Key.R, 0.18f, 0.315f, 0.09f, 0.12f, false)
             };
         }
 
@@ -157,6 +157,12 @@ namespace SortingStation
                 cabinSwayPixels = 7f;
                 cabinSwayRotationDegrees = 0.48f;
                 cabinSwaySmoothSeconds = 0.26f;
+                if (configurationVersion < 9)
+                {
+                    // Keep the radio's large touch target clear of the bell while the
+                    // Winamp-style player itself remains in the same left-hand area.
+                    SetBindingRect(CabControlAction.Radio, 0.18f, 0.315f, 0.09f, 0.12f);
+                }
                 configurationVersion = CurrentConfigurationVersion;
             }
             if (controls == null || controls.Length == 0)

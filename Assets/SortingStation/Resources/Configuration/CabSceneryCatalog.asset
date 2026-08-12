@@ -310,17 +310,92 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+  - id: real_oak_group
+    sprite: {fileID: 21300000, guid: df7d7003481b0644584ffaca39db316f, type: 3}
+    layer: 2
+    segments: 00000000010000000200000004000000
+    baseSize: {x: 500, y: 590}
+    scaleRange: {x: 0.95, y: 1.3}
+    speedMultiplier: 1.16
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: real_birch_grove
+    sprite: {fileID: 21300000, guid: 7df3e2490aa51c346b0027f5e3079e65, type: 3}
+    layer: 1
+    segments: 000000000100000002000000
+    baseSize: {x: 470, y: 650}
+    scaleRange: {x: 0.95, y: 1.3}
+    speedMultiplier: 0.92
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: real_pine_group
+    sprite: {fileID: 21300000, guid: ffc424c0fb3815f40a60ef5773a55e3e, type: 3}
+    layer: 2
+    segments: 0100000006000000
+    baseSize: {x: 500, y: 660}
+    scaleRange: {x: 0.95, y: 1.3}
+    speedMultiplier: 1.1
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: real_poplar_row
+    sprite: {fileID: 21300000, guid: b4423ef01bf5b62498b22ae546b029a2, type: 3}
+    layer: 1
+    segments: 00000000020000000400000003000000
+    baseSize: {x: 460, y: 680}
+    scaleRange: {x: 0.95, y: 1.3}
+    speedMultiplier: 0.88
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: real_maple_group
+    sprite: {fileID: 21300000, guid: 75ef55bfcbdae204d96b7d2af3121ebd, type: 3}
+    layer: 2
+    segments: 00000000010000000200000003000000
+    baseSize: {x: 510, y: 610}
+    scaleRange: {x: 0.95, y: 1.3}
+    speedMultiplier: 1.14
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: real_mixed_forest
+    sprite: {fileID: 21300000, guid: 806f73858e238334683e5e3738357b48, type: 3}
+    layer: 1
+    segments: 01000000
+    baseSize: {x: 740, y: 610}
+    scaleRange: {x: 0.95, y: 1.3}
+    speedMultiplier: 0.86
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+  - id: real_willow_group
+    sprite: {fileID: 21300000, guid: 21df633b689af98479673c9f9e5eec2f, type: 3}
+    layer: 2
+    segments: 050000000000000002000000
+    baseSize: {x: 520, y: 610}
+    scaleRange: {x: 0.95, y: 1.3}
+    speedMultiplier: 1.08
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
   poolSize: 56
   seasonalGrounds:
   - {fileID: 687447721551520008, guid: d88c41a2216004f4abc2b09715265219, type: 3}
   - {fileID: -4905457143732390349, guid: d88c41a2216004f4abc2b09715265219, type: 3}
   - {fileID: -5559667657986882776, guid: d88c41a2216004f4abc2b09715265219, type: 3}
   - {fileID: 7685737032185354566, guid: d88c41a2216004f4abc2b09715265219, type: 3}
-  forestBand: {fileID: 8732292555042372730, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
-  shrubBand: {fileID: 6639860878872309664, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
-  distantBackdrop: {fileID: -9111833856690225530, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
-  townBand: {fileID: 5125469599591842924, guid: 2f8a3fc459811b44ebd2290fddc3a83d, type: 3}
-  forestDensityMultiplier: 1.85
+  uniformGround: {fileID: 21300000, guid: 8e0186e003f1e7048912349b42fe8975, type: 3}
+  forestBand: {fileID: 8732292555042372730, guid: 91830c0fd0de1814e9fb6cb756655fca, type: 3}
+  shrubBand: {fileID: 6639860878872309664, guid: 91830c0fd0de1814e9fb6cb756655fca, type: 3}
+  distantBackdrop: {fileID: -9111833856690225530, guid: 91830c0fd0de1814e9fb6cb756655fca, type: 3}
+  distantMountainsLeft: {fileID: 21300000, guid: 515f5195dd8fbc0488a19dd543d32d37, type: 3}
+  distantMountainsRight: {fileID: 21300000, guid: 4178c2c6acbbb284b95308d8ec7cb7ac, type: 3}
+  townBand: {fileID: 5125469599591842924, guid: 91830c0fd0de1814e9fb6cb756655fca, type: 3}
+  forestDensityMultiplier: 2.75
   townDensityMultiplier: 2.15
+  mountainSeparationPixels: 34
+  mountainSeparationDistance: 1500
   seasonCycleDistance: 900
   weatherOverlayAlpha: 0.16

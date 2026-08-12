@@ -18,6 +18,7 @@ namespace SortingStation.EditorTools
         private const string GeneratedArtRoot = Root + "/Art/Generated";
         private const string CabArtRoot = Root + "/Art/Cab";
         private const string CabSceneryArtRoot = CabArtRoot + "/Scenery";
+        private const string RealisticSceneryRoot = CabSceneryArtRoot + "/Realistic/v1";
         private const string CabControlsArtRoot = CabArtRoot + "/Controls";
         private const string CabRadioArtRoot = CabArtRoot + "/Radio";
         private const string CabRouteRoot = Root + "/Data/CabRoutes";
@@ -230,7 +231,21 @@ namespace SortingStation.EditorTools
                 Scenery("waterfall", CabSceneryArtRoot + "/landmarks-atlas-v1.png", "waterfall", CabSceneryLayer.Middle,
                     new Vector2(540f, 430f), 0.60f, false, false, true, RouteSegmentType.Water, RouteSegmentType.MountainTunnel),
                 Scenery("castle_ruins", CabSceneryArtRoot + "/landmarks-atlas-v1.png", "castle_ruins", CabSceneryLayer.Far,
-                    new Vector2(580f, 420f), 0.46f, false, false, true, RouteSegmentType.Meadow, RouteSegmentType.Forest, RouteSegmentType.MountainTunnel)
+                    new Vector2(580f, 420f), 0.46f, false, false, true, RouteSegmentType.Meadow, RouteSegmentType.Forest, RouteSegmentType.MountainTunnel),
+                ScenerySingle("real_oak_group", "tall-oak-group-v1.png", CabSceneryLayer.Near, new Vector2(500f, 590f), 1.16f,
+                    RouteSegmentType.Meadow, RouteSegmentType.Forest, RouteSegmentType.Village, RouteSegmentType.Road),
+                ScenerySingle("real_birch_grove", "tall-birch-grove-v1.png", CabSceneryLayer.Middle, new Vector2(470f, 650f), 0.92f,
+                    RouteSegmentType.Meadow, RouteSegmentType.Forest, RouteSegmentType.Village),
+                ScenerySingle("real_pine_group", "tall-pine-group-v1.png", CabSceneryLayer.Near, new Vector2(500f, 660f), 1.10f,
+                    RouteSegmentType.Forest, RouteSegmentType.MountainTunnel),
+                ScenerySingle("real_poplar_row", "tall-poplar-row-v1.png", CabSceneryLayer.Middle, new Vector2(460f, 680f), 0.88f,
+                    RouteSegmentType.Meadow, RouteSegmentType.Village, RouteSegmentType.Road, RouteSegmentType.Town),
+                ScenerySingle("real_maple_group", "tall-maple-group-v1.png", CabSceneryLayer.Near, new Vector2(510f, 610f), 1.14f,
+                    RouteSegmentType.Meadow, RouteSegmentType.Forest, RouteSegmentType.Village, RouteSegmentType.Town),
+                ScenerySingle("real_mixed_forest", "dense-mixed-forest-v1.png", CabSceneryLayer.Middle, new Vector2(740f, 610f), 0.86f,
+                    RouteSegmentType.Forest),
+                ScenerySingle("real_willow_group", "tall-willow-group-v1.png", CabSceneryLayer.Near, new Vector2(520f, 610f), 1.08f,
+                    RouteSegmentType.Water, RouteSegmentType.Meadow, RouteSegmentType.Village)
             };
 
             CabSceneryCatalog catalog = GetOrCreate<CabSceneryCatalog>(ConfigRoot + "/CabSceneryCatalog.asset");
@@ -247,6 +262,10 @@ namespace SortingStation.EditorTools
                 LoadNamedSprite(CabSceneryArtRoot + "/parallax-bands-atlas-v1.png", "shrub_band"),
                 LoadNamedSprite(CabSceneryArtRoot + "/parallax-bands-atlas-v1.png", "distant_mountains"),
                 LoadNamedSprite(CabSceneryArtRoot + "/parallax-bands-atlas-v1.png", "town_band"));
+            catalog.ConfigureRealisticBackdropIfMissing(
+                LoadSprite(RealisticSceneryRoot + "/uniform-summer-grass-v1.png"),
+                LoadSprite(RealisticSceneryRoot + "/mountain-horizon-left-v1.png"),
+                LoadSprite(RealisticSceneryRoot + "/mountain-horizon-right-v1.png"));
             catalog.ConfigureRadioArtworkIfMissing(
                 LoadSprite(CabRadioArtRoot + "/radio-previous-v1.png"),
                 LoadSprite(CabRadioArtRoot + "/radio-play-v1.png"),
@@ -282,6 +301,24 @@ namespace SortingStation.EditorTools
                 centered = centered,
                 mirrorAllowed = mirror,
                 poolSpawn = poolSpawn
+            };
+        }
+
+        private static CabSceneryDefinition ScenerySingle(string id, string fileName, CabSceneryLayer layer,
+            Vector2 size, float speed, params RouteSegmentType[] segments)
+        {
+            return new CabSceneryDefinition
+            {
+                id = id,
+                sprite = LoadSprite(RealisticSceneryRoot + "/" + fileName),
+                layer = layer,
+                segments = segments,
+                baseSize = size,
+                scaleRange = new Vector2(0.95f, 1.30f),
+                speedMultiplier = speed,
+                centered = false,
+                mirrorAllowed = true,
+                poolSpawn = true
             };
         }
 
@@ -411,6 +448,11 @@ namespace SortingStation.EditorTools
 
             ConfigureSingleSprite(CabArtRoot + "/cab-overlay-v1.png");
             ConfigureSingleSprite(CabArtRoot + "/train-keychain-v1.png");
+            if (Directory.Exists(RealisticSceneryRoot))
+            {
+                foreach (string file in Directory.GetFiles(RealisticSceneryRoot, "*.png"))
+                    ConfigureSingleSprite(file.Replace('\\', '/'));
+            }
             ConfigureAtlas(CabSceneryArtRoot + "/nature-atlas-v1.png",
                 "tree_deciduous", "tree_pine", "bush_fence", "telegraph_pole");
             ConfigureAtlas(CabSceneryArtRoot + "/settlements-atlas-v1.png",
