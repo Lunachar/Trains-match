@@ -46,10 +46,35 @@ namespace SortingStation.EditorTools
             EditorGUILayout.PropertyField(serializedObject.FindProperty("cabRadioMusic"), new GUIContent("Резервный трек радио"));
             radioPlaylist?.DoLayoutList();
             DrawRadioDropArea();
+            EditorGUILayout.Space(5f);
+            EditorGUILayout.LabelField("Онлайн-радио", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("Отдельная кнопка в плеере подключается к HLS-потоку через системный медиаплеер Android. Адрес страницы указан только как источник; для воспроизведения используется прямой URL трансляции. Интернет-радио и локальный плейлист взаимно отключаются.", MessageType.Info);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("onlineRadioEnabled"), new GUIContent("Разрешить онлайн-радио"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("onlineRadioName"), new GUIContent("Название станции"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("onlineRadioStreamUrl"), new GUIContent("Прямой URL потока"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("onlineRadioSourceUrl"), new GUIContent("Страница-источник"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("railLoop"), new GUIContent("Шум рельсов (петля)"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("rainLoop"), new GUIContent("Дождь (петля)"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("snowLoop"), new GUIContent("Мягкий снег (петля)"));
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Звуковые события", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("events"), new GUIContent("Банки вариантов"), true);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Окружение во время поездки", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("Добавьте несколько вариантов для каждого события: коровы, трактор, птицы, река, переезд, деревня, отдельный проезд города и другие объекты. Пустые банки работают бесшумно.", MessageType.Info);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("ambientEvents"), new GUIContent("События окружения"), true);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Реплики диспетчера", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("Записи заменяют системную речь для четырёх событий. Можно положить несколько вариантов каждой реплики.", MessageType.Info);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("dispatcherAnnouncements"), new GUIContent("Подключаемые реплики"), true);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Связь с диспетчером", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("Пары запускаются только кнопкой «Связь» в кабине. В каждой паре первый клип — реплика состава, второй — ответ диспетчера; текстовые поля служат подсказкой для записи.", MessageType.Info);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("dispatcherRadioPairs"), new GUIContent("Пары реплик связи"), true);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Спокойные взаимодействия", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("Для каждого события можно добавить звуки реакции. Для связи с диспетчером заполните обе группы: вызов и ответ. Пустая обязательная пара автоматически исключает событие.", MessageType.Info);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("cabInteractionAudio"), new GUIContent("Звуки взаимодействий"), true);
             serializedObject.ApplyModifiedProperties();
             EditorGUILayout.Space();
             using (new EditorGUILayout.HorizontalScope())
@@ -61,6 +86,19 @@ namespace SortingStation.EditorTools
                 }
                 if (GUILayout.Button("Убрать пустые слоты", GUILayout.Height(34f))) RemoveNullRadioTracks();
                 if (GUILayout.Button("Проверить аудио", GUILayout.Height(34f))) ProjectBootstrapper.ValidateProjectMenu();
+            }
+            if (GUILayout.Button("Добавить все отсутствующие события и реплики", GUILayout.Height(34f)))
+            {
+                Undo.RecordObject(target, "Add ambient audio events");
+                ((AudioCatalog)target).ConfigureAmbientDefaultsIfMissing();
+                ((AudioCatalog)target).ConfigureDispatcherDefaultsIfMissing();
+                ((AudioCatalog)target).ConfigureDispatcherRadioPairDefaultsIfMissing();
+                CabInteractionDefinition[] definitions = CabInteractionCatalog.CreateDefaultInteractions();
+                string[] ids = new string[definitions.Length];
+                for (int i = 0; i < definitions.Length; i++) ids[i] = definitions[i].id;
+                ((AudioCatalog)target).ConfigureInteractionDefaultsIfMissing(ids);
+                EditorUtility.SetDirty(target);
+                serializedObject.Update();
             }
         }
 
@@ -122,6 +160,24 @@ namespace SortingStation.EditorTools
         }
     }
 
+    [CustomEditor(typeof(CabInteractionCatalog))]
+    public sealed class CabInteractionCatalogInspector : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            EditorGUILayout.HelpBox("Настройте частоту ненавязчивых событий, редкие остановки и условия каждой реакции. Значок показывается без текста и не требует ответа.", MessageType.Info);
+            DrawDefaultInspector();
+            EditorGUILayout.Space();
+            if (GUILayout.Button("Восстановить стартовые 12 взаимодействий", GUILayout.Height(34f)))
+            {
+                Undo.RecordObject(target, "Reset cab interactions");
+                ((CabInteractionCatalog)target).ConfigureDefaults();
+                EditorUtility.SetDirty(target);
+            }
+            if (GUILayout.Button("Проверить каталог", GUILayout.Height(34f))) ProjectBootstrapper.ValidateProjectMenu();
+        }
+    }
+
     [CustomEditor(typeof(AppSettings))]
     public sealed class AppSettingsInspector : Editor
     {
@@ -171,7 +227,7 @@ namespace SortingStation.EditorTools
             Group("Движение", ("maximumSpeedKph", "Максимальная скорость, км/ч"), ("accelerationSeconds", "Разгон до максимума, сек."), ("serviceBrakeSeconds", "Полное торможение, сек."), ("coastSeconds", "Выбег, сек."), ("rollingResistancePerSecond", "Сопротивление качению"), ("keyboardThrottleStep", "Шаг тяги с клавиатуры"), ("tractionCurve", "Кривая тяги"), ("brakingCurve", "Кривая торможения"));
             Group("Мир за окном", ("worldUnitsPerSecond", "Скорость движения мира"), ("routeSeed", "Seed маршрута"), ("horizon", "Высота горизонта"), ("perspectiveStrength", "Сила перспективы"));
             Group("Брелок", ("keychainAccelerationDegrees", "Реакция на разгон"), ("keychainRailDegrees", "Вибрация от рельсов"), ("keychainSmoothSeconds", "Затухание"));
-            Group("Покачивание кабины", ("cabinSwayPixels", "Смещение, пиксели"), ("cabinSwayRotationDegrees", "Наклон, градусы"), ("cabinSwaySmoothSeconds", "Плавность"));
+            Group("Покачивание кабины", ("cabinSwayPixels", "Смещение, пиксели"), ("cabinSwayRotationDegrees", "Наклон, градусы"), ("cabinSwaySmoothSeconds", "Плавность"), ("androidCabinSwayMultiplier", "Усиление на Android"));
             Group("Освещение", ("headlightLandscapeAlpha", "Фары снаружи"), ("headlightTunnelAlpha", "Фары в туннеле"), ("cabinLightAlpha", "Свет кабины"), ("instrumentIdleAlpha", "Подсветка приборов"), ("instrumentCabinBoost", "Усиление приборов"), ("lightTransitionSeconds", "Плавность включения"));
             EditorGUILayout.Space(4f);
             EditorGUILayout.LabelField("Органы управления", EditorStyles.boldLabel);
@@ -265,11 +321,76 @@ namespace SortingStation.EditorTools
     [CustomEditor(typeof(CabSceneryCatalog))]
     public sealed class CabSceneryCatalogInspector : Editor
     {
+        private float previewDistance;
+        private int previewSpeed;
+
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.HelpBox("Перетащите сюда кабину, брелок, маски света и спрайты маршрута. В разделе Layered backdrop меняются сезоны, лес, кустарники, дальний план, город, плотность и темп смены погоды. Слои видны отдельными объектами в CabRideLayoutPreview во время Play.", MessageType.Info);
+            EditorGUILayout.HelpBox("Здесь настраиваются слои травы, положение и движение гор, тени окружения, деревянные и железобетонные участки пути. Изменения можно проверять в Play Mode сцены CabRideLayoutPreview.", MessageType.Info);
             DrawDefaultInspector();
+            EditorGUILayout.Space(8f);
+            EditorGUILayout.LabelField("Предпросмотр кабины", EditorStyles.boldLabel);
+            previewSpeed = GUILayout.Toolbar(previewSpeed, new[] { "Стоп", "Средняя", "Полная" });
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Горы 0%")) Preview(0f);
+                if (GUILayout.Button("Горы 50%")) Preview(0.50f);
+                if (GUILayout.Button("Горы 90%")) Preview(0.90f);
+            }
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Деревянный путь")) Preview(0.08f);
+                if (GUILayout.Button("Бетонный путь")) Preview(0.62f);
+            }
             if (GUILayout.Button("Проверить маршрут и графику", GUILayout.Height(34f))) ProjectBootstrapper.ValidateProjectMenu();
+        }
+
+        private void Preview(float normalizedDistance)
+        {
+            MountainMotionSettings settings = ((CabSceneryCatalog)target).MountainMotion;
+            previewDistance = Mathf.Clamp01(normalizedDistance) * settings.cycleDistance;
+            CabRideController controller = FindObjectOfType<CabRideController>();
+            if (controller == null)
+            {
+                Debug.Log("Откройте CabRideLayoutPreview и включите Play Mode для предпросмотра.");
+                return;
+            }
+            float throttle = previewSpeed == 0 ? 0f : previewSpeed == 1 ? 0.50f : 1f;
+            controller.ConfigureSceneryPreviewAtSpeed(RouteSegmentType.Forest, 0.48f, previewDistance, throttle);
+        }
+    }
+
+    [CustomEditor(typeof(CabEnvironmentCatalog))]
+    public sealed class CabEnvironmentCatalogInspector : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            EditorGUILayout.HelpBox(
+                "Все параметры поездки редактируются здесь. Сезон фиксирован на поездку; время суток и погода продолжают меняться даже на остановке. Сигналы работают информативно.",
+                MessageType.Info);
+            serializedObject.Update();
+            Draw("Время суток", "dayCycleSeconds", "startTime01", "dawnSky", "daySky", "sunsetSky", "nightSky", "sun", "moon");
+            Draw("Небо, облака и солнечный блик", "cloudVerticalRange", "cloudOpacityMultiplier", "horizonFogRange",
+                "sunGlareColor", "sunGlareSize", "sunGlareIntensity", "sunGlareHorizon", "sunGlareHorizonBand");
+            Draw("Сезоны и атмосфера", "seasons");
+            Draw("Погода", "weatherProfiles", "minimumWeatherSeconds", "maximumWeatherSeconds", "weatherTransitionSeconds");
+            Draw("Осенние кленовые листья", "autumnMapleLeaf", "minimumLeafEventSeconds", "maximumLeafEventSeconds",
+                "leafEventDuration", "flyingLeafCount", "leafStickChance", "maximumStuckLeaves");
+            Draw("Мягкие события маршрута", "routeEvents", "minimumEventMovingSeconds", "maximumEventMovingSeconds");
+            Draw("Знаки и светофоры", "tracksideMarkers", "enforcementMode", "minimumMarkerGapSegments", "maximumMarkerGapSegments");
+            serializedObject.ApplyModifiedProperties();
+            if (GUILayout.Button("Проверить сезоны и маршрут", GUILayout.Height(34f))) ProjectBootstrapper.ValidateProjectMenu();
+        }
+
+        private void Draw(string title, params string[] properties)
+        {
+            EditorGUILayout.Space(5f);
+            EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
+            foreach (string property in properties)
+            {
+                SerializedProperty value = serializedObject.FindProperty(property);
+                if (value != null) EditorGUILayout.PropertyField(value, true);
+            }
         }
     }
 }

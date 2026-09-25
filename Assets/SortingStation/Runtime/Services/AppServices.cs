@@ -14,6 +14,8 @@ namespace SortingStation
         public AudioCatalog AudioCatalog { get; private set; }
         public CabRideDefinition CabRide { get; private set; }
         public CabSceneryCatalog CabScenery { get; private set; }
+        public CabEnvironmentCatalog CabEnvironment { get; private set; }
+        public CabInteractionCatalog CabInteractions { get; private set; }
         public IAudioService Audio { get; private set; }
         public ISpeechService Speech { get; private set; }
         public IProgressRepository Progress { get; private set; }
@@ -74,6 +76,8 @@ namespace SortingStation
             AudioCatalog = Resources.Load<AudioCatalog>(ConfigRoot + "AudioCatalog");
             CabRide = Resources.Load<CabRideDefinition>(ConfigRoot + "CabRideDefinition");
             CabScenery = Resources.Load<CabSceneryCatalog>(ConfigRoot + "CabSceneryCatalog");
+            CabEnvironment = Resources.Load<CabEnvironmentCatalog>(ConfigRoot + "CabEnvironmentCatalog");
+            CabInteractions = Resources.Load<CabInteractionCatalog>(ConfigRoot + "CabInteractionCatalog");
 
             if (Settings == null) Settings = ScriptableObject.CreateInstance<AppSettings>();
             if (Games == null) Games = ScriptableObject.CreateInstance<GameCatalog>();
@@ -81,6 +85,14 @@ namespace SortingStation
             if (AudioCatalog == null) AudioCatalog = ScriptableObject.CreateInstance<AudioCatalog>();
             if (CabRide == null) CabRide = ScriptableObject.CreateInstance<CabRideDefinition>();
             if (CabScenery == null) CabScenery = ScriptableObject.CreateInstance<CabSceneryCatalog>();
+            if (CabEnvironment == null) CabEnvironment = ScriptableObject.CreateInstance<CabEnvironmentCatalog>();
+            if (CabInteractions == null)
+            {
+                CabInteractions = ScriptableObject.CreateInstance<CabInteractionCatalog>();
+#if UNITY_EDITOR
+                CabInteractions.ConfigureDefaults();
+#endif
+            }
         }
     }
 }

@@ -53,7 +53,9 @@ namespace SortingStation.EditorTools
         {
             string output = ReadArgument("-smokeOutput");
             bool timeline = HasArgument("-rideTimeline");
-            int expectedCount = HasArgument("-trackPreview") ? 3 :
+            int expectedCount = HasArgument("-trackPreview") || HasArgument("-switchMotionPreview") ? 3 :
+                HasArgument("-weatherPreview") ? 2 :
+                HasArgument("-radioUiPreview") || HasArgument("-autumnLeavesPreview") ? 1 :
                 HasArgument("-departurePreview") ? 1 :
                 timeline ? 3 : ExpectedImageCount;
             if (string.IsNullOrWhiteSpace(output))

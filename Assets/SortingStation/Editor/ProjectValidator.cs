@@ -17,6 +17,8 @@ namespace SortingStation.EditorTools
             AppSettings settings = Load<AppSettings>("AppSettings");
             CabRideDefinition cab = Load<CabRideDefinition>("CabRideDefinition");
             CabSceneryCatalog cabScenery = Load<CabSceneryCatalog>("CabSceneryCatalog");
+            CabEnvironmentCatalog environment = Load<CabEnvironmentCatalog>("CabEnvironmentCatalog");
+            CabInteractionCatalog interactions = Load<CabInteractionCatalog>("CabInteractionCatalog");
 
             if (games == null) issues.Add("GameCatalog is missing. Run Sorting Station/Create or Refresh Project.");
             else
@@ -52,6 +54,35 @@ namespace SortingStation.EditorTools
                 {
                     if (audio.Find(cue) == null) issues.Add($"AudioCatalog: {cue} event is missing.");
                 }
+                foreach (CabAmbientSound cue in (CabAmbientSound[])System.Enum.GetValues(typeof(CabAmbientSound)))
+                    if (audio.FindAmbient(cue) == null) issues.Add($"AudioCatalog: ambient event {cue} is missing.");
+                foreach (DispatcherVoiceCue cue in (DispatcherVoiceCue[])System.Enum.GetValues(typeof(DispatcherVoiceCue)))
+                    if (audio.FindDispatcher(cue) == null) issues.Add($"AudioCatalog: dispatcher announcement {cue} is missing.");
+                if (interactions != null)
+                {
+                    foreach (CabInteractionDefinition item in interactions.Interactions)
+                        if (item != null && audio.FindInteraction(item.id) == null)
+                            issues.Add($"AudioCatalog: interaction audio bank '{item.id}' is missing.");
+                }
+            }
+
+            if (interactions == null) issues.Add("CabInteractionCatalog is missing.");
+            else
+            {
+                CabInteractionDefinition[] values = interactions.Interactions;
+                string[] ids = values.Where(item => item != null).Select(item => item.id).ToArray();
+                if (values.Length < 12) issues.Add("Cab interactions: the starter set should contain 12 events.");
+                if (ids.Any(string.IsNullOrWhiteSpace) || ids.Distinct(System.StringComparer.OrdinalIgnoreCase).Count() != ids.Length)
+                    issues.Add("Cab interactions: ids must be non-empty and unique.");
+                if (interactions.MinimumIntervalSeconds < 45f || interactions.MaximumIntervalSeconds > 90f)
+                    issues.Add("Cab interactions: gentle event interval should remain within 45–90 moving seconds.");
+                foreach (CabInteractionDefinition item in values.Where(item => item != null))
+                {
+                    if (item.minimumSpeed01 > item.maximumSpeed01)
+                        issues.Add($"Cab interactions: '{item.id}' has an invalid speed range.");
+                    if (item.hintSeconds > item.opportunitySeconds)
+                        issues.Add($"Cab interactions: '{item.id}' hint lasts longer than the opportunity.");
+                }
             }
 
             if (visuals == null) issues.Add("VisualCatalog is missing.");
@@ -76,6 +107,39 @@ namespace SortingStation.EditorTools
                 CheckContrast(issues, "Bright text / brake", settings.TextOnBrightColor, settings.BrakeColor, 4.5f);
             }
 
+            if (environment == null)
+            {
+                issues.Add("CabEnvironmentCatalog is missing.");
+            }
+            else
+            {
+                if (environment.DayCycleSeconds < 60f) issues.Add("Environment: day cycle is too short.");
+                if (environment.AutumnMapleLeaf == null) issues.Add("Environment: autumn maple leaf sprite is missing.");
+                foreach (SeasonType type in (SeasonType[])System.Enum.GetValues(typeof(SeasonType)))
+                {
+                    SeasonThemeDefinition season = environment.FindSeason(type);
+                    if (season == null) { issues.Add($"Environment: season {type} is missing."); continue; }
+                    if (season.groundNear == null || season.groundMiddle == null || season.groundFar == null)
+                        issues.Add($"Environment: season {type} needs three ground layers.");
+                    if (season.weatherWeights == null || !season.weatherWeights.Any(weight => weight != null && weight.weight > 0f))
+                        issues.Add($"Environment: season {type} has no weather weights.");
+                    if (type != SeasonType.Winter && season.Weight(WeatherType.Snow) > 0f)
+                        issues.Add($"Environment: snow is only allowed in winter, not {type}.");
+                }
+                string[] eventIds = environment.RouteEvents.Where(item => item != null).Select(item => item.id).ToArray();
+                if (eventIds.Any(string.IsNullOrWhiteSpace) || eventIds.Distinct().Count() != eventIds.Length)
+                    issues.Add("Environment: route event ids must be non-empty and unique.");
+                foreach (RouteEventDefinition routeEvent in environment.RouteEvents.Where(item => item != null && !item.hideInWorld && item.sprite == null))
+                    issues.Add($"Environment: route event '{routeEvent.id}' has no sprite.");
+                string[] markerIds = environment.TracksideMarkers.Where(item => item != null).Select(item => item.id).ToArray();
+                if (markerIds.Any(string.IsNullOrWhiteSpace) || markerIds.Distinct().Count() != markerIds.Length)
+                    issues.Add("Environment: marker ids must be non-empty and unique.");
+                foreach (TracksideMarkerDefinition marker in environment.TracksideMarkers.Where(item => item != null && item.sprite == null))
+                    issues.Add($"Environment: trackside marker '{marker.id}' has no sprite.");
+                if (environment.TracksideMarkers.Any(item => item != null && item.aspect == SignalAspect.Red && item.kind != TracksideMarkerKind.SideSignal))
+                    issues.Add("Environment: red signal may only be assigned to a side signal in informative mode.");
+            }
+
             if (cab == null)
             {
                 issues.Add("CabRideDefinition is missing.");
@@ -83,9 +147,10 @@ namespace SortingStation.EditorTools
             else
             {
                 CabControlBinding[] controls = cab.Controls;
-                if (controls.Where(binding => binding != null).Select(binding => binding.action).Distinct().Count() != 8)
+                int expectedControlCount = System.Enum.GetValues(typeof(CabControlAction)).Length;
+                if (controls.Where(binding => binding != null).Select(binding => binding.action).Distinct().Count() != expectedControlCount)
                 {
-                    issues.Add("CabRideDefinition: exactly eight unique cab actions are required.");
+                    issues.Add($"CabRideDefinition: exactly {expectedControlCount} unique cab actions are required.");
                 }
                 for (int i = 0; i < controls.Length; i++)
                 {
@@ -146,6 +211,45 @@ namespace SortingStation.EditorTools
                     }
                 }
                 if (cabScenery.Keychain == null) issues.Add("CabSceneryCatalog: keychain sprite is not assigned.");
+                if (cabScenery.ThrottleSliderTrack == null) issues.Add("CabSceneryCatalog: throttle slider track is not assigned.");
+                if (cabScenery.ThrottleSliderHandle == null) issues.Add("CabSceneryCatalog: throttle slider handle is not assigned.");
+                if (cabScenery.UniformGround == null && cabScenery.SeasonalGrounds.All(sprite => sprite == null))
+                    issues.Add("CabSceneryCatalog: no grass texture is assigned.");
+                GroundMotionSettings ground = cabScenery.GroundMotion;
+                if (CabWorldRenderer.GroundFlowParticleLimit(ground, MotionLevel.Normal) < CabWorldRenderer.GroundFlowParticleLimit(ground, MotionLevel.Reduced))
+                    issues.Add("CabSceneryCatalog: reduced ground-flow particle count must not exceed normal count.");
+                if (ground.flowSpeedMultiplier <= 0f || ground.flowTravelDistance <= 0f || ground.flowSpawnDistance <= 0f)
+                    issues.Add("CabSceneryCatalog: ground-flow speed, travel distance and spawn distance must be positive.");
+                if (cabScenery.DistantMountainsLeft == null || cabScenery.DistantMountainsRight == null)
+                    issues.Add("CabSceneryCatalog: both split mountain sprites are required.");
+                MountainMotionSettings mountains = cabScenery.MountainMotion;
+                if (mountains.leftBaselineNormalized <= 0f || mountains.rightBaselineNormalized <= 0f)
+                    issues.Add("CabSceneryCatalog: mountain baselines must be inside the source images.");
+                SleeperVisualSettings sleepers = cabScenery.SleeperVisuals;
+                if (sleepers.woodenSprite == null) issues.Add("CabSceneryCatalog: wooden sleeper sprite is missing.");
+                if (sleepers.concreteSprite == null) issues.Add("CabSceneryCatalog: concrete sleeper sprite is missing.");
+                if (sleepers.maximumSectionSleepers < sleepers.minimumSectionSleepers)
+                    issues.Add("CabSceneryCatalog: sleeper section maximum must not be smaller than minimum.");
+                TrackShadowSettings trackShadows = cabScenery.TrackShadows;
+                if (trackShadows.railWidthMultiplier <= 0f || trackShadows.contactWidthMultiplier <= 0f ||
+                    trackShadows.contactHeightMultiplier <= 0f)
+                    issues.Add("CabSceneryCatalog: track shadow dimensions must be positive.");
+                if (trackShadows.nearOpacity < 0f || trackShadows.nearOpacity > 1f ||
+                    trackShadows.farOpacity < 0f || trackShadows.farOpacity > 1f ||
+                    trackShadows.contactOpacity < 0f || trackShadows.contactOpacity > 1f)
+                    issues.Add("CabSceneryCatalog: track shadow opacity values must stay in 0..1.");
+                if (cabScenery.Scenery.Any(entry => entry != null && entry.CastsShadow && entry.shadowFootprintWidth <= 0f))
+                    issues.Add("CabSceneryCatalog: every shadow-casting scenery item needs a positive footprint width.");
+                foreach (CabSceneryDefinition entry in cabScenery.Scenery.Where(entry => entry != null && entry.animationMode != SceneryAnimationMode.None))
+                {
+                    if (!entry.HasUsableAnimation)
+                        issues.Add($"CabSceneryCatalog: animated scenery '{entry.id}' has no usable animation frames.");
+                    if (entry.animationMode == SceneryAnimationMode.FlyAcross || entry.animationMode == SceneryAnimationMode.DriveAcross)
+                    {
+                        if (entry.localSpeed <= 0f)
+                            issues.Add($"CabSceneryCatalog: moving scenery '{entry.id}' needs positive local speed.");
+                    }
+                }
                 RouteSegmentType[] expected = (RouteSegmentType[])System.Enum.GetValues(typeof(RouteSegmentType));
                 foreach (RouteSegmentType type in expected)
                 {

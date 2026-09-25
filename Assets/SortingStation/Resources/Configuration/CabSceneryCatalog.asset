@@ -16,11 +16,13 @@ MonoBehaviour:
   keychain: {fileID: 21300000, guid: 3ab3003163f79f54ab2707bb695e1c40, type: 3}
   headlightMask: {fileID: 0}
   cabinLightMask: {fileID: 0}
-  radioPlayerSkin: {fileID: 21300000, guid: bbb7f817e005c524798e9f0b219ad293, type: 3}
+  radioPlayerSkin: {fileID: 0}
   radioPrevious: {fileID: 0}
   radioPlay: {fileID: 0}
   radioNext: {fileID: 0}
   radioPlaylist: {fileID: 0}
+  throttleSliderTrack: {fileID: 21300000, guid: 72e225097d1cd914a8376f44b9257f98, type: 3}
+  throttleSliderHandle: {fileID: 21300000, guid: 01724e7a759925a4c8371729e7e10ea2, type: 3}
   routeSegments:
   - {fileID: 11400000, guid: e0cdf16aedf4b484d8bb05c0eaaa2232, type: 2}
   - {fileID: 11400000, guid: fd49a90e2ac23c94c844c7ce69d482d3, type: 2}
@@ -32,6 +34,13 @@ MonoBehaviour:
   scenery:
   - id: tree_deciduous
     sprite: {fileID: 6944233165910682514, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -4619225671636611914, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -7735524583353800329, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 2
     segments: 00000000010000000200000004000000
     baseSize: {x: 360, y: 300}
@@ -40,8 +49,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: tree_pine
     sprite: {fileID: 6983589859096036457, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -3752302006209197468, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -3285345644299721952, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: 5792711662776823362, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 1
     segments: 0100000006000000
     baseSize: {x: 410, y: 340}
@@ -50,8 +71,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: bush_fence
     sprite: {fileID: 2943404031390888131, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -9117700664522547202, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: 7002809658567184843, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -4774430840962090167, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 2
     segments: 000000000200000004000000
     baseSize: {x: 360, y: 250}
@@ -60,6 +93,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: telegraph_pole
     sprite: {fileID: 5379843555606107083, guid: 99ab72dc85357ff4083af27713058f93, type: 3}
     layer: 2
@@ -70,6 +108,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: village_houses
     sprite: {fileID: -4124212852815044677, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
     layer: 1
@@ -80,6 +123,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: barn
     sprite: {fileID: -6847935165863209887, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
     layer: 1
@@ -90,6 +138,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: town_block
     sprite: {fileID: -881029689960839251, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
     layer: 0
@@ -100,6 +153,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: cars
     sprite: {fileID: -2373160362985190845, guid: 8b99954a9d317cf4d86190c7e58a002a, type: 3}
     layer: 2
@@ -110,6 +168,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: cows
     sprite: {fileID: -3641001793436527819, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
     layer: 1
@@ -120,6 +183,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: sheep
     sprite: {fileID: 3053566679240924513, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
     layer: 1
@@ -130,6 +198,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: river_bridge
     sprite: {fileID: 1654385442492048536, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
     layer: 2
@@ -140,6 +213,11 @@ MonoBehaviour:
     centered: 1
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: lake
     sprite: {fileID: -5051115896102233841, guid: b94beb291a7e71e43835e98f58d4a617, type: 3}
     layer: 1
@@ -150,6 +228,11 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: mountain_ridge
     sprite: {fileID: -8247361158256445083, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
     layer: 0
@@ -160,6 +243,11 @@ MonoBehaviour:
     centered: 1
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: tunnel_portal
     sprite: {fileID: -897802387918450154, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
     layer: 1
@@ -170,6 +258,11 @@ MonoBehaviour:
     centered: 1
     mirrorAllowed: 0
     poolSpawn: 0
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: stone_bridge
     sprite: {fileID: -2428600594186682869, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
     layer: 2
@@ -180,6 +273,11 @@ MonoBehaviour:
     centered: 1
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: tunnel_lamps
     sprite: {fileID: 4878471364012812451, guid: 746c8e5a08ded0d409675f89f45be169, type: 3}
     layer: 2
@@ -190,8 +288,13 @@ MonoBehaviour:
     centered: 1
     mirrorAllowed: 0
     poolSpawn: 0
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: tractor
-    sprite: {fileID: 1534292470153311352, guid: 48729da13374b684ba07a63241005205, type: 3}
+    sprite: {fileID: -6967734793328256649, guid: 2928ededc71338641a34bc569e259670, type: 3}
     layer: 2
     segments: 0000000002000000
     baseSize: {x: 410, y: 290}
@@ -200,8 +303,13 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: horses
-    sprite: {fileID: -7327042303958652010, guid: 48729da13374b684ba07a63241005205, type: 3}
+    sprite: {fileID: -546522725127389342, guid: 2928ededc71338641a34bc569e259670, type: 3}
     layer: 1
     segments: 00000000
     baseSize: {x: 410, y: 290}
@@ -210,8 +318,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: hay_bales
-    sprite: {fileID: 6661796321754428580, guid: 48729da13374b684ba07a63241005205, type: 3}
+    sprite: {fileID: -7420641264748083587, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -7420641264748083587, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: 6858416120011685140, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -8359000450008130310, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 2
     segments: 0000000002000000
     baseSize: {x: 430, y: 300}
@@ -220,8 +340,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: windmill
-    sprite: {fileID: -5521130737796374665, guid: 48729da13374b684ba07a63241005205, type: 3}
+    sprite: {fileID: 6858416120011685140, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -7420641264748083587, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: 6858416120011685140, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -8359000450008130310, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 1
     segments: 0000000002000000
     baseSize: {x: 440, y: 370}
@@ -230,8 +362,13 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: rural_station
-    sprite: {fileID: 5820737842932475405, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    sprite: {fileID: 4112990466283465773, guid: 2928ededc71338641a34bc569e259670, type: 3}
     layer: 1
     segments: 0200000003000000
     baseSize: {x: 520, y: 350}
@@ -240,8 +377,13 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: level_crossing
-    sprite: {fileID: -8234472447570065011, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    sprite: {fileID: 6126306701609952809, guid: a7bece7ef615cae47b512836ffb1b659, type: 3}
     layer: 2
     segments: 040000000200000003000000
     baseSize: {x: 560, y: 330}
@@ -250,8 +392,13 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: railway_signal
-    sprite: {fileID: 3204747379480863313, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    sprite: {fileID: -2901761627228345803, guid: a7bece7ef615cae47b512836ffb1b659, type: 3}
     layer: 2
     segments: 040000000200000003000000
     baseSize: {x: 220, y: 380}
@@ -260,8 +407,13 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: water_tower
-    sprite: {fileID: 87598699333754140, guid: aaa16b7ea59428c448d514f91ff0853d, type: 3}
+    sprite: {fileID: -6967734793328256649, guid: 2928ededc71338641a34bc569e259670, type: 3}
     layer: 1
     segments: 0200000003000000
     baseSize: {x: 460, y: 390}
@@ -270,8 +422,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: birch_grove
-    sprite: {fileID: -6217364339280654760, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -4619225671636611914, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -7735524583353800329, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 1
     segments: 0100000000000000
     baseSize: {x: 520, y: 360}
@@ -280,8 +444,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: sunflower_field
-    sprite: {fileID: -8242211579933634875, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    sprite: {fileID: 468428707094108030, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: 468428707094108030, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: 6413998170901735146, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -1572675478427128869, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 1
     segments: 0000000002000000
     baseSize: {x: 540, y: 260}
@@ -290,8 +466,13 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: waterfall
-    sprite: {fileID: 4392170440827130783, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    sprite: {fileID: 6835623021567943830, guid: 2928ededc71338641a34bc569e259670, type: 3}
     layer: 1
     segments: 0500000006000000
     baseSize: {x: 540, y: 430}
@@ -300,8 +481,13 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: castle_ruins
-    sprite: {fileID: -1039665174665886631, guid: e29f19d3d094fc5469a1e9ad93940503, type: 3}
+    sprite: {fileID: -7352398740264864547, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
     layer: 0
     segments: 000000000100000006000000
     baseSize: {x: 580, y: 420}
@@ -310,8 +496,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 0
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: real_oak_group
     sprite: {fileID: 21300000, guid: df7d7003481b0644584ffaca39db316f, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -4619225671636611914, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -7735524583353800329, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 2
     segments: 00000000010000000200000004000000
     baseSize: {x: 500, y: 590}
@@ -320,8 +518,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: real_birch_grove
     sprite: {fileID: 21300000, guid: 7df3e2490aa51c346b0027f5e3079e65, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -4619225671636611914, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -7735524583353800329, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 1
     segments: 000000000100000002000000
     baseSize: {x: 470, y: 650}
@@ -330,8 +540,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: real_pine_group
     sprite: {fileID: 21300000, guid: ffc424c0fb3815f40a60ef5773a55e3e, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -3752302006209197468, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -3285345644299721952, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: 5792711662776823362, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 2
     segments: 0100000006000000
     baseSize: {x: 500, y: 660}
@@ -340,8 +562,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: real_poplar_row
     sprite: {fileID: 21300000, guid: b4423ef01bf5b62498b22ae546b029a2, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -4619225671636611914, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -7735524583353800329, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 1
     segments: 00000000020000000400000003000000
     baseSize: {x: 460, y: 680}
@@ -350,8 +584,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: real_maple_group
     sprite: {fileID: 21300000, guid: 75ef55bfcbdae204d96b7d2af3121ebd, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -4619225671636611914, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -7735524583353800329, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 2
     segments: 00000000010000000200000003000000
     baseSize: {x: 510, y: 610}
@@ -360,8 +606,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: real_mixed_forest
     sprite: {fileID: 21300000, guid: 806f73858e238334683e5e3738357b48, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -3752302006209197468, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -3285345644299721952, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: 5792711662776823362, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 1
     segments: 01000000
     baseSize: {x: 740, y: 610}
@@ -370,8 +628,20 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
   - id: real_willow_group
     sprite: {fileID: 21300000, guid: 21df633b689af98479673c9f9e5eec2f, type: 3}
+    seasonalSprites:
+    - season: 0
+      sprite: {fileID: -5112471327223199621, guid: b12b5bebc9b42b74390a93ea8d9027de, type: 3}
+    - season: 2
+      sprite: {fileID: -4619225671636611914, guid: a246f655f6ae40847bed34cfe40769b4, type: 3}
+    - season: 3
+      sprite: {fileID: -7735524583353800329, guid: 9f1f5bade708fda41a7fb003bcd84ea1, type: 3}
     layer: 2
     segments: 050000000000000002000000
     baseSize: {x: 520, y: 610}
@@ -380,6 +650,281 @@ MonoBehaviour:
     centered: 0
     mirrorAllowed: 1
     poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
+  - id: real_animated_windmill
+    sprite: {fileID: 21300000, guid: e0da7e6f5b4246db928f3360386ab8e8, type: 3}
+    layer: 1
+    segments: 0000000002000000
+    baseSize: {x: 330, y: 330}
+    scaleRange: {x: 0.85, y: 1.18}
+    speedMultiplier: 0.82
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.82
+    shadowFootprintHeight: 0.13
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
+    animationMode: 1
+    frameSprites:
+    - {fileID: 21300000, guid: e0da7e6f5b4246db928f3360386ab8e8, type: 3}
+    - {fileID: 21300000, guid: 9a9db13972024c30b92f078614a36815, type: 3}
+    - {fileID: 21300000, guid: ade6cf32fccb4a8ca6100ec568f0413b, type: 3}
+    - {fileID: 21300000, guid: 5c8954ee1f544fde9e2675eea985ea76, type: 3}
+    - {fileID: 21300000, guid: a261998d3f8c4e6a888448cbee6364dc, type: 3}
+    - {fileID: 21300000, guid: 6318103cd8d6423cb391442f6f8f221d, type: 3}
+    - {fileID: 21300000, guid: 85ce95724298448399aa48633de3003f, type: 3}
+    - {fileID: 21300000, guid: 09afb823589c4e5282d504496b45f80e, type: 3}
+    framesPerSecond: 7
+    motionDirection: {x: 0, y: 0}
+    localSpeed: 0
+    spawnChance: 0.32
+    useSoundCue: 1
+    soundCue: 19
+    loopAnimation: 1
+  - id: real_animated_wind_turbine
+    sprite: {fileID: 21300000, guid: 2c0a68ab6e8847a5a768f00ba82d5339, type: 3}
+    layer: 0
+    segments: 0000000003000000
+    baseSize: {x: 300, y: 430}
+    scaleRange: {x: 0.75, y: 1.05}
+    speedMultiplier: 0.62
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.52
+    shadowFootprintHeight: 0.08
+    shadowOffset: {x: 0.05, y: -0.02}
+    shadowOpacity: 0.75
+    animationMode: 1
+    frameSprites:
+    - {fileID: 21300000, guid: 2c0a68ab6e8847a5a768f00ba82d5339, type: 3}
+    - {fileID: 21300000, guid: 25965c55f7d34e0c82761e6a1b7a89dd, type: 3}
+    - {fileID: 21300000, guid: d951b412a2a44429ac45e46f04010049, type: 3}
+    - {fileID: 21300000, guid: 0fdae7196a7e4030a17a88b007827e32, type: 3}
+    - {fileID: 21300000, guid: 8e22832617cf4b7c9054f39ef5fbc9d5, type: 3}
+    - {fileID: 21300000, guid: 34d543724bc34b9587441c482ee62977, type: 3}
+    - {fileID: 21300000, guid: 7709a438f4a04e95a771e430acea2b23, type: 3}
+    - {fileID: 21300000, guid: 2fe5c0be412441c2a9d298f9de79192f, type: 3}
+    framesPerSecond: 5
+    motionDirection: {x: 0, y: 0}
+    localSpeed: 0
+    spawnChance: 0.22
+    useSoundCue: 1
+    soundCue: 25
+    loopAnimation: 1
+  - id: real_animated_car_blue
+    sprite: {fileID: 21300000, guid: dfdc0d6a1d7d4061ba4aae3ebe5c7717, type: 3}
+    layer: 1
+    segments: 040000000300000002000000
+    baseSize: {x: 250, y: 150}
+    scaleRange: {x: 0.75, y: 1.1}
+    speedMultiplier: 1.1
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.86
+    shadowFootprintHeight: 0.16
+    shadowOffset: {x: 0.05, y: -0.02}
+    shadowOpacity: 0.9
+    animationMode: 4
+    frameSprites:
+    - {fileID: 21300000, guid: dfdc0d6a1d7d4061ba4aae3ebe5c7717, type: 3}
+    - {fileID: 21300000, guid: 5b57ac470d4644ec9bfeae0ae19270be, type: 3}
+    - {fileID: 21300000, guid: bef8c13dcdb244a4b271b664a5e20bd7, type: 3}
+    - {fileID: 21300000, guid: 6cca901d8f774665ab9164814e95909e, type: 3}
+    framesPerSecond: 8
+    motionDirection: {x: 1, y: 0}
+    localSpeed: 38
+    spawnChance: 0.52
+    useSoundCue: 1
+    soundCue: 6
+    loopAnimation: 1
+  - id: real_animated_birds
+    sprite: {fileID: 21300000, guid: 910c6b13d3484912a438a8bdd7047d61, type: 3}
+    layer: 0
+    segments: 000000000100000005000000
+    baseSize: {x: 250, y: 150}
+    scaleRange: {x: 0.55, y: 0.92}
+    speedMultiplier: 0.7
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+    shadowMode: 2
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 0
+    animationMode: 3
+    frameSprites:
+    - {fileID: 21300000, guid: 910c6b13d3484912a438a8bdd7047d61, type: 3}
+    - {fileID: 21300000, guid: 29736a7c953845d7a0678c5e5987bc8c, type: 3}
+    - {fileID: 21300000, guid: af53733b481648d9a8f9034a82de389f, type: 3}
+    - {fileID: 21300000, guid: 98d4df62d68740158f81a161d9ed4010, type: 3}
+    - {fileID: 21300000, guid: 4e83c86587da4308bae5df86e5e55cef, type: 3}
+    - {fileID: 21300000, guid: 5bceda275e324ba89ee852c29404c5f2, type: 3}
+    framesPerSecond: 9
+    motionDirection: {x: 1, y: 0.18}
+    localSpeed: 34
+    spawnChance: 0.26
+    useSoundCue: 1
+    soundCue: 0
+    loopAnimation: 1
+  - id: real_animated_airplane
+    sprite: {fileID: 21300000, guid: 8aa62336e03640ac962c86165eaec0b0, type: 3}
+    layer: 0
+    segments: 0000000001000000030000000400000005000000
+    baseSize: {x: 230, y: 130}
+    scaleRange: {x: 0.42, y: 0.7}
+    speedMultiplier: 0.48
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+    shadowMode: 2
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 0
+    animationMode: 3
+    frameSprites:
+    - {fileID: 21300000, guid: 8aa62336e03640ac962c86165eaec0b0, type: 3}
+    - {fileID: 21300000, guid: 6eff0a910cf74eb69261e53b4f0e7e06, type: 3}
+    - {fileID: 21300000, guid: 03f1df975bfe44d98e155b438a344c20, type: 3}
+    - {fileID: 21300000, guid: 2edfce8e204a44dfa66eb70957abce59, type: 3}
+    framesPerSecond: 4
+    motionDirection: {x: 1, y: 0.1}
+    localSpeed: 28
+    spawnChance: 0.08
+    useSoundCue: 1
+    soundCue: 24
+    loopAnimation: 1
+  - id: real_animated_tractor
+    sprite: {fileID: 21300000, guid: 53e2b5f548ec4813a0ac77e47dbc21b9, type: 3}
+    layer: 2
+    segments: 0000000002000000
+    baseSize: {x: 260, y: 190}
+    scaleRange: {x: 0.8, y: 1.08}
+    speedMultiplier: 1.0
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.86
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 1
+    animationMode: 4
+    frameSprites:
+    - {fileID: 21300000, guid: 53e2b5f548ec4813a0ac77e47dbc21b9, type: 3}
+    - {fileID: 21300000, guid: 84fa009e71e443c19e467d3e2ab7dc8e, type: 3}
+    - {fileID: 21300000, guid: 57ce31f5defd44ea9a3a7c12f07c7152, type: 3}
+    - {fileID: 21300000, guid: 0bd7222982ef4921bce2cc96143d0d69, type: 3}
+    - {fileID: 21300000, guid: 17c77f1fba284d049e345883a11d763a, type: 3}
+    - {fileID: 21300000, guid: 22be2aa344b342b48b5de6be24cb8183, type: 3}
+    framesPerSecond: 7
+    motionDirection: {x: -1, y: 0}
+    localSpeed: 16
+    spawnChance: 0.25
+    useSoundCue: 1
+    soundCue: 4
+    loopAnimation: 1
+  - id: real_animated_boat
+    sprite: {fileID: 21300000, guid: 2d3dd2e0118a4334986e37527b3b4dea, type: 3}
+    layer: 1
+    segments: 05000000
+    baseSize: {x: 260, y: 180}
+    scaleRange: {x: 0.78, y: 1.08}
+    speedMultiplier: 0.72
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+    shadowMode: 2
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 0
+    animationMode: 5
+    frameSprites:
+    - {fileID: 21300000, guid: 2d3dd2e0118a4334986e37527b3b4dea, type: 3}
+    - {fileID: 21300000, guid: 967e58535f064ea09f6d84aa0341ae86, type: 3}
+    - {fileID: 21300000, guid: f9b734bfef90478d8f5c623b6a653b3a, type: 3}
+    - {fileID: 21300000, guid: b9cd7dbf07924d5bb2f8adb4451e5e44, type: 3}
+    - {fileID: 21300000, guid: 07c4490935ba4abe8267c7d13f64d243, type: 3}
+    - {fileID: 21300000, guid: f8bb9b2a4a594343b484518c6f06a01e, type: 3}
+    framesPerSecond: 5
+    motionDirection: {x: 0.5, y: 0}
+    localSpeed: 9
+    spawnChance: 0.22
+    useSoundCue: 1
+    soundCue: 26
+    loopAnimation: 1
+  - id: real_animated_flag
+    sprite: {fileID: 21300000, guid: e71a15b6299b4861a48e3e4eb3929f95, type: 3}
+    layer: 1
+    segments: 0200000003000000
+    baseSize: {x: 180, y: 220}
+    scaleRange: {x: 0.75, y: 1.05}
+    speedMultiplier: 0.8
+    centered: 0
+    mirrorAllowed: 0
+    poolSpawn: 1
+    shadowMode: 0
+    shadowFootprintWidth: 0.42
+    shadowFootprintHeight: 0.08
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 0.8
+    animationMode: 1
+    frameSprites:
+    - {fileID: 21300000, guid: e71a15b6299b4861a48e3e4eb3929f95, type: 3}
+    - {fileID: 21300000, guid: 4c424c93f3224637bb4d6b83e0f621c8, type: 3}
+    - {fileID: 21300000, guid: 9f5ff8c298d8466499eb131b56bb6c05, type: 3}
+    - {fileID: 21300000, guid: cea234c54b094acb953edb94ae637f88, type: 3}
+    - {fileID: 21300000, guid: 73321d19699c45f5ba3cd6744540258b, type: 3}
+    - {fileID: 21300000, guid: e065c62c7fae47e799cd403cc983d270, type: 3}
+    framesPerSecond: 6
+    motionDirection: {x: 0, y: 0}
+    localSpeed: 0
+    spawnChance: 0.22
+    useSoundCue: 0
+    soundCue: 23
+    loopAnimation: 1
+  - id: real_animated_smoke_chimney
+    sprite: {fileID: 21300000, guid: 85bbb55601fa441cad4418b57cda37a6, type: 3}
+    layer: 0
+    segments: 0200000003000000
+    baseSize: {x: 210, y: 230}
+    scaleRange: {x: 0.7, y: 1.05}
+    speedMultiplier: 0.62
+    centered: 0
+    mirrorAllowed: 1
+    poolSpawn: 1
+    shadowMode: 2
+    shadowFootprintWidth: 0.76
+    shadowFootprintHeight: 0.15
+    shadowOffset: {x: 0.06, y: -0.02}
+    shadowOpacity: 0
+    animationMode: 1
+    frameSprites:
+    - {fileID: 21300000, guid: 85bbb55601fa441cad4418b57cda37a6, type: 3}
+    - {fileID: 21300000, guid: bac90c6c3f8c49e8872d52cc30e169d6, type: 3}
+    - {fileID: 21300000, guid: 7786402456484fd0b8af889384e570b7, type: 3}
+    - {fileID: 21300000, guid: 071852234c1245c985e3dbc7dd63cfed, type: 3}
+    - {fileID: 21300000, guid: ab882d8e3233461aaa933eec638ad35b, type: 3}
+    - {fileID: 21300000, guid: fd4d66e154764395a5feb257dbb7bf96, type: 3}
+    framesPerSecond: 5
+    motionDirection: {x: 0, y: 0}
+    localSpeed: 0
+    spawnChance: 0.18
+    useSoundCue: 0
+    soundCue: 23
+    loopAnimation: 1
   poolSize: 56
   seasonalGrounds:
   - {fileID: 687447721551520008, guid: d88c41a2216004f4abc2b09715265219, type: 3}
@@ -395,6 +940,69 @@ MonoBehaviour:
   townBand: {fileID: 5125469599591842924, guid: 91830c0fd0de1814e9fb6cb756655fca, type: 3}
   forestDensityMultiplier: 2.75
   townDensityMultiplier: 2.15
+  groundMotion:
+    layerSpeeds: {x: 0.00045, y: 0.00115, z: 0.0024}
+    layerTiling: {x: 1.35, y: 2.1, z: 3.25}
+    sidewaysDrift: 0.018
+    normalFlowParticleCount: 80
+    reducedFlowParticleCount: 25
+    flowSpeedMultiplier: 2.45
+    flowTravelDistance: 82
+    flowSpawnDistance: 1.15
+    flowWidthNormalized: 0.62
+    flowNearColor: {r: 0.92, g: 0.82, b: 0.42, a: 0.72}
+    flowFarColor: {r: 0.42, g: 0.58, b: 0.24, a: 0.26}
+  mountainMotion:
+    horizonBottomOffsetNormalized: -0.025
+    horizonBandHeightNormalized: 0.19
+    leftBaselineNormalized: 0.181
+    rightBaselineNormalized: 0.322
+    leftHeightMultiplier: 1.3
+    rightHeightMultiplier: 1.75
+    leftWidthMultiplier: 2.15
+    rightWidthMultiplier: 2.25
+    separationPixels: 64
+    seamOverlapPixels: 112
+    edgeOverscanNormalized: 0.1
+    endScale: 1.06
+    cycleDistance: 1700
+    crossFadeFraction: 0.18
+  sceneryShadows:
+    color: {r: 0.055, g: 0.075, b: 0.035, a: 0.34}
+    direction: {x: 0.72, y: -0.28}
+    length: 0.12
+    width: 0.82
+    height: 0.16
+    farOpacity: 0.18
+    nearOpacity: 1
+    contactColor: {r: 0.025, g: 0.035, b: 0.018, a: 0.58}
+    contactWidth: 0.76
+    contactHeight: 0.28
+    contactVerticalOffset: -0.012
+    contactFarOpacity: 0.42
+    contactNearOpacity: 1.12
+  sleeperVisuals:
+    woodenSprite: {fileID: 21300000, guid: 8594fb7e0ea68e84cbea5e3bc127ade4, type: 3}
+    concreteSprite: {fileID: 21300000, guid: 67728d0ad9687f24ea84873beb0d6b64, type: 3}
+    woodenTint: {r: 0.82, g: 0.68, b: 0.5, a: 1}
+    concreteTint: {r: 0.88, g: 0.9, b: 0.88, a: 1}
+    woodenShadeVariation: 0.08
+    minimumSectionSleepers: 80
+    maximumSectionSleepers: 140
+    concreteProbability: 0.25
+    forceConcreteAfterWoodSections: 4
+    shadowColor: {r: 0.035, g: 0.045, b: 0.025, a: 0.3}
+    shadowOffset: {x: 4, y: -2}
+  trackShadows:
+    railShadowColor: {r: 0.025, g: 0.036, b: 0.018, a: 0.48}
+    farOpacity: 0.12
+    nearOpacity: 0.58
+    railWidthMultiplier: 2.35
+    railOffset: {x: 5, y: -3}
+    contactColor: {r: 0.018, g: 0.026, b: 0.012, a: 0.34}
+    contactOpacity: 0.32
+    contactWidthMultiplier: 1.72
+    contactHeightMultiplier: 0.82
   mountainSeparationPixels: 34
   mountainSeparationDistance: 1500
   seasonCycleDistance: 900

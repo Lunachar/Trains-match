@@ -21,6 +21,12 @@ namespace SortingStation
         [SerializeField] private Sprite radioNext;
         [SerializeField] private Sprite radioPlaylist;
 
+        [Header("Throttle slider artwork")]
+        [Tooltip("Wide decorative rail used by the horizontal throttle control.")]
+        [SerializeField] private Sprite throttleSliderTrack;
+        [Tooltip("Movable grip used by the horizontal throttle control.")]
+        [SerializeField] private Sprite throttleSliderHandle;
+
         [Header("Endless route")]
         [SerializeField] private RouteSegmentDefinition[] routeSegments = Array.Empty<RouteSegmentDefinition>();
         [SerializeField] private CabSceneryDefinition[] scenery = Array.Empty<CabSceneryDefinition>();
@@ -38,6 +44,11 @@ namespace SortingStation
         [SerializeField] private Sprite townBand;
         [SerializeField] [Range(0.5f, 4f)] private float forestDensityMultiplier = 2.75f;
         [SerializeField] [Range(0.5f, 3f)] private float townDensityMultiplier = 2.15f;
+        [SerializeField] private GroundMotionSettings groundMotion = new GroundMotionSettings();
+        [SerializeField] private MountainMotionSettings mountainMotion = new MountainMotionSettings();
+        [SerializeField] private SceneryShadowSettings sceneryShadows = new SceneryShadowSettings();
+        [SerializeField] private SleeperVisualSettings sleeperVisuals = new SleeperVisualSettings();
+        [SerializeField] private TrackShadowSettings trackShadows = new TrackShadowSettings();
         [SerializeField] [Range(0f, 80f)] private float mountainSeparationPixels = 34f;
         [SerializeField] [Min(120f)] private float mountainSeparationDistance = 1500f;
         [SerializeField] [Min(120f)] private float seasonCycleDistance = 900f;
@@ -52,6 +63,8 @@ namespace SortingStation
         public Sprite RadioPlay => radioPlay;
         public Sprite RadioNext => radioNext;
         public Sprite RadioPlaylist => radioPlaylist;
+        public Sprite ThrottleSliderTrack => throttleSliderTrack;
+        public Sprite ThrottleSliderHandle => throttleSliderHandle;
         public RouteSegmentDefinition[] RouteSegments => routeSegments ?? Array.Empty<RouteSegmentDefinition>();
         public CabSceneryDefinition[] Scenery => scenery ?? Array.Empty<CabSceneryDefinition>();
         public int PoolSize => Mathf.Clamp(poolSize, 16, 96);
@@ -65,10 +78,13 @@ namespace SortingStation
         public Sprite TownBand => townBand;
         public float ForestDensityMultiplier => Mathf.Clamp(forestDensityMultiplier, 0.5f, 4f);
         public float TownDensityMultiplier => Mathf.Clamp(townDensityMultiplier, 0.5f, 3f);
+        public GroundMotionSettings GroundMotion => groundMotion ?? (groundMotion = new GroundMotionSettings());
+        public MountainMotionSettings MountainMotion => mountainMotion ?? (mountainMotion = new MountainMotionSettings());
+        public SceneryShadowSettings SceneryShadows => sceneryShadows ?? (sceneryShadows = new SceneryShadowSettings());
+        public SleeperVisualSettings SleeperVisuals => sleeperVisuals ?? (sleeperVisuals = new SleeperVisualSettings());
+        public TrackShadowSettings TrackShadows => trackShadows ?? (trackShadows = new TrackShadowSettings());
         public float SeasonCycleDistance => Mathf.Max(120f, seasonCycleDistance);
         public float WeatherOverlayAlpha => Mathf.Clamp(weatherOverlayAlpha, 0.02f, 0.45f);
-        public float MountainSeparationPixels => Mathf.Clamp(mountainSeparationPixels, 0f, 80f);
-        public float MountainSeparationDistance => Mathf.Max(120f, mountainSeparationDistance);
 
         public CabSceneryDefinition Find(string id)
         {
@@ -130,6 +146,11 @@ namespace SortingStation
                 {
                     if (mergedScenery[j] != null && string.Equals(mergedScenery[j].id, candidate.id, StringComparison.OrdinalIgnoreCase))
                     {
+                        if (mergedScenery[j].sprite == null && candidate.sprite != null)
+                            mergedScenery[j].sprite = candidate.sprite;
+                        if ((mergedScenery[j].seasonalSprites == null || mergedScenery[j].seasonalSprites.Length == 0) &&
+                            candidate.seasonalSprites != null && candidate.seasonalSprites.Length > 0)
+                            mergedScenery[j].seasonalSprites = candidate.seasonalSprites;
                         exists = true;
                         break;
                     }
@@ -159,6 +180,34 @@ namespace SortingStation
             if (distantMountainsRight == null) distantMountainsRight = mountainsRight;
             if (mountainSeparationPixels <= 0f) mountainSeparationPixels = 34f;
             if (mountainSeparationDistance <= 0f) mountainSeparationDistance = 1500f;
+            if (mountainMotion == null) mountainMotion = new MountainMotionSettings();
+            if (mountainMotion.leftWidthMultiplier < 1f) mountainMotion.leftWidthMultiplier = 2.15f;
+            if (mountainMotion.rightWidthMultiplier < 1f) mountainMotion.rightWidthMultiplier = 2.25f;
+        }
+
+        public void ConfigureShadowDefaultsIfMissing()
+        {
+            if (sceneryShadows == null) sceneryShadows = new SceneryShadowSettings();
+            if (sceneryShadows.contactColor.a <= 0f)
+                sceneryShadows.contactColor = new Color(0.025f, 0.035f, 0.018f, 0.58f);
+            if (sceneryShadows.contactWidth <= 0f) sceneryShadows.contactWidth = 0.76f;
+            if (sceneryShadows.contactHeight <= 0f) sceneryShadows.contactHeight = 0.28f;
+            if (sceneryShadows.contactFarOpacity <= 0f) sceneryShadows.contactFarOpacity = 0.42f;
+            if (sceneryShadows.contactNearOpacity <= 0f) sceneryShadows.contactNearOpacity = 1.12f;
+            if (trackShadows == null) trackShadows = new TrackShadowSettings();
+            if (trackShadows.railShadowColor.a <= 0f)
+                trackShadows.railShadowColor = new Color(0.025f, 0.036f, 0.018f, 0.48f);
+            if (trackShadows.nearOpacity <= 0f) trackShadows.nearOpacity = 0.58f;
+            if (trackShadows.railWidthMultiplier < 1f) trackShadows.railWidthMultiplier = 2.35f;
+            if (trackShadows.contactOpacity <= 0f) trackShadows.contactOpacity = 0.32f;
+            if (trackShadows.contactWidthMultiplier < 1f) trackShadows.contactWidthMultiplier = 1.72f;
+        }
+
+        public void ConfigureTrackVisualsIfMissing(Sprite woodenSleeper, Sprite concreteSleeper)
+        {
+            if (sleeperVisuals == null) sleeperVisuals = new SleeperVisualSettings();
+            if (sleeperVisuals.woodenSprite == null) sleeperVisuals.woodenSprite = woodenSleeper;
+            if (sleeperVisuals.concreteSprite == null) sleeperVisuals.concreteSprite = concreteSleeper;
         }
 
         public void ConfigureRadioArtworkIfMissing(Sprite previous, Sprite play, Sprite next, Sprite playlist)
@@ -172,6 +221,12 @@ namespace SortingStation
         public void ConfigureRadioSkinIfMissing(Sprite skin)
         {
             if (radioPlayerSkin == null) radioPlayerSkin = skin;
+        }
+
+        public void ConfigureThrottleSliderIfMissing(Sprite track, Sprite handle)
+        {
+            if (throttleSliderTrack == null) throttleSliderTrack = track;
+            if (throttleSliderHandle == null) throttleSliderHandle = handle;
         }
 #endif
     }

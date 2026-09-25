@@ -40,6 +40,26 @@ namespace SortingStation
                 yield return CaptureTrackPreview();
                 yield break;
             }
+            if (Array.Exists(Environment.GetCommandLineArgs(), arg => string.Equals(arg, "-switchMotionPreview", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return CaptureSwitchMotionPreview();
+                yield break;
+            }
+            if (Array.Exists(Environment.GetCommandLineArgs(), arg => string.Equals(arg, "-weatherPreview", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return CaptureWeatherPreview();
+                yield break;
+            }
+            if (Array.Exists(Environment.GetCommandLineArgs(), arg => string.Equals(arg, "-radioUiPreview", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return CaptureRadioUiPreview();
+                yield break;
+            }
+            if (Array.Exists(Environment.GetCommandLineArgs(), arg => string.Equals(arg, "-autumnLeavesPreview", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return CaptureAutumnLeavesPreview();
+                yield break;
+            }
 
             yield return WaitForScene(SceneNames.MainMenu);
             yield return Capture("01-main-menu.png");
@@ -120,6 +140,75 @@ namespace SortingStation
             yield return new WaitForSecondsRealtime(0.6f);
             yield return Capture("03-level-crossing.png", 1600, 1000);
             Debug.Log("TRACK_PREVIEW_COMPLETE=" + outputDirectory);
+            yield return new WaitForSecondsRealtime(0.2f);
+            Application.Quit();
+        }
+
+        private IEnumerator CaptureSwitchMotionPreview()
+        {
+            yield return WaitForScene(SceneNames.MainMenu);
+            AppServices.Instance.Session.Select(GameMode.CabRide, 2);
+            SceneManager.LoadScene(SceneNames.CabRide);
+            yield return WaitForScene(SceneNames.CabRide);
+            CabRideController cab = FindObjectOfType<CabRideController>();
+            if (cab != null) cab.ConfigureTrackPreview(RouteSegmentType.Village, 0.18f);
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return Capture("01-switch-horizon.png", 1600, 1000);
+            if (cab != null) cab.ConfigureTrackPreview(RouteSegmentType.Village, 0.50f);
+            yield return new WaitForSecondsRealtime(0.25f);
+            yield return Capture("02-switch-middle.png", 1600, 1000);
+            if (cab != null) cab.ConfigureTrackPreview(RouteSegmentType.Village, 0.80f);
+            yield return new WaitForSecondsRealtime(0.25f);
+            yield return Capture("03-switch-near.png", 1600, 1000);
+            Debug.Log("SWITCH_MOTION_PREVIEW_COMPLETE=" + outputDirectory);
+            yield return new WaitForSecondsRealtime(0.2f);
+            Application.Quit();
+        }
+
+        private IEnumerator CaptureWeatherPreview()
+        {
+            yield return WaitForScene(SceneNames.MainMenu);
+            AppServices.Instance.Session.Select(GameMode.CabRide, 2);
+            SceneManager.LoadScene(SceneNames.CabRide);
+            yield return WaitForScene(SceneNames.CabRide);
+            CabRideController cab = FindObjectOfType<CabRideController>();
+            if (cab != null) cab.ConfigureWeatherPreview(false);
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return Capture("01-rain-wipers-off.png", 1600, 1000);
+            if (cab != null) cab.ConfigureWeatherPreview(true);
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return Capture("02-rain-wipers-on.png", 1600, 1000);
+            Debug.Log("WEATHER_PREVIEW_COMPLETE=" + outputDirectory);
+            yield return new WaitForSecondsRealtime(0.2f);
+            Application.Quit();
+        }
+
+        private IEnumerator CaptureRadioUiPreview()
+        {
+            yield return WaitForScene(SceneNames.MainMenu);
+            AppServices.Instance.Session.Select(GameMode.CabRide, 2);
+            SceneManager.LoadScene(SceneNames.CabRide);
+            yield return WaitForScene(SceneNames.CabRide);
+            CabRideController cab = FindObjectOfType<CabRideController>();
+            if (cab != null) cab.ConfigureRadioUiPreview();
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return Capture("radio-and-throttle-ui.png", 1600, 1000);
+            Debug.Log("RADIO_UI_PREVIEW_COMPLETE=" + outputDirectory);
+            yield return new WaitForSecondsRealtime(0.2f);
+            Application.Quit();
+        }
+
+        private IEnumerator CaptureAutumnLeavesPreview()
+        {
+            yield return WaitForScene(SceneNames.MainMenu);
+            AppServices.Instance.Session.Select(GameMode.CabRide, 2);
+            SceneManager.LoadScene(SceneNames.CabRide);
+            yield return WaitForScene(SceneNames.CabRide);
+            CabRideController cab = FindObjectOfType<CabRideController>();
+            if (cab != null) cab.ConfigureAutumnLeafPreview(false);
+            yield return new WaitForSecondsRealtime(1.4f);
+            yield return Capture("autumn-leaves-window.png", 1600, 1000);
+            Debug.Log("AUTUMN_LEAVES_PREVIEW_COMPLETE=" + outputDirectory);
             yield return new WaitForSecondsRealtime(0.2f);
             Application.Quit();
         }

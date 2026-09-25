@@ -101,6 +101,12 @@ namespace SortingStation
             RefreshTransform();
         }
 
+        public void SetPressScale(float value)
+        {
+            pressedScale = Mathf.Clamp(value, 0.95f, 1f);
+            RefreshTransform();
+        }
+
         public void SetInteractable(bool value)
         {
             Interactable = value;
@@ -197,6 +203,11 @@ namespace SortingStation
         private void OnDisable()
         {
             group?.Unregister(this);
+        }
+
+        private void OnEnable()
+        {
+            group?.Register(this);
         }
 
         private void RefreshVisual()

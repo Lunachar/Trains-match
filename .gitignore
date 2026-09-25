@@ -8,3 +8,10 @@
 /*.csproj
 /*.sln
 /Builds/
+/Backups/
+/.repowise/
+/.claude/
+/.vscode/
+/.mcp.json
+*.user
+*.suo

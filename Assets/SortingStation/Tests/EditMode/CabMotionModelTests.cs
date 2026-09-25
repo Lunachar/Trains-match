@@ -92,6 +92,34 @@ namespace SortingStation.Tests
             Assert.That(model.Speed01, Is.LessThan(before).And.GreaterThan(before - 0.05f));
         }
 
+        [Test]
+        public void AndroidCabinSway_IsVisibleButStillHonorsReducedMotion()
+        {
+            float windows = CabRideController.CabSwayMotionMultiplier(MotionLevel.Normal, false,
+                definition.AndroidCabinSwayMultiplier);
+            float android = CabRideController.CabSwayMotionMultiplier(MotionLevel.Normal, true,
+                definition.AndroidCabinSwayMultiplier);
+            float reducedAndroid = CabRideController.CabSwayMotionMultiplier(MotionLevel.Reduced, true,
+                definition.AndroidCabinSwayMultiplier);
+            float disabledAndroid = CabRideController.CabSwayMotionMultiplier(MotionLevel.Off, true,
+                definition.AndroidCabinSwayMultiplier);
+
+            Assert.That(android, Is.GreaterThan(windows));
+            Assert.That(reducedAndroid, Is.GreaterThan(0f).And.LessThan(android));
+            Assert.That(disabledAndroid, Is.Zero);
+        }
+
+        [Test]
+        public void VigilanceAcknowledge_ReleasesAutomaticStop()
+        {
+            bool automaticStop = true;
+
+            bool released = CabRideController.TryReleaseAutomaticStop(true, ref automaticStop);
+
+            Assert.That(released, Is.True);
+            Assert.That(automaticStop, Is.False);
+        }
+
         private CabMotionModel AcceleratedModel()
         {
             CabMotionModel model = new CabMotionModel(definition);

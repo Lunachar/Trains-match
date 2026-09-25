@@ -49,8 +49,9 @@ namespace SortingStation.EditorTools
 
         public static void BuildAll()
         {
-            BuildAndroidApk();
-            BuildWindows();
+            ProjectBootstrapper.BuildProject();
+            Build(AndroidOutput, BuildTarget.Android, BuildOptions.None);
+            Build(WindowsOutput, BuildTarget.StandaloneWindows64, BuildOptions.None);
         }
 
         private static void Build(string relativePath, BuildTarget target, BuildOptions options)

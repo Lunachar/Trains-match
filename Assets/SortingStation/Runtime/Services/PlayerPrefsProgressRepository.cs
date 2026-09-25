@@ -16,7 +16,9 @@ namespace SortingStation
 
             try
             {
-                return JsonUtility.FromJson<UserPreferences>(json) ?? new UserPreferences();
+                UserPreferences preferences = JsonUtility.FromJson<UserPreferences>(json) ?? new UserPreferences();
+                preferences.Upgrade();
+                return preferences;
             }
             catch
             {
@@ -26,6 +28,7 @@ namespace SortingStation
 
         public void SavePreferences(UserPreferences preferences)
         {
+            preferences?.Upgrade();
             PlayerPrefs.SetString(PreferencesKey, JsonUtility.ToJson(preferences ?? new UserPreferences()));
             PlayerPrefs.Save();
         }

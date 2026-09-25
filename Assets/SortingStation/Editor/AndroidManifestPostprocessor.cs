@@ -1,6 +1,5 @@
 #if UNITY_ANDROID
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using UnityEditor.Android;
 using UnityEngine;
@@ -8,9 +7,8 @@ using UnityEngine;
 namespace SortingStation.EditorTools
 {
     /// <summary>
-    /// The game has no network features. Unity can still add INTERNET while
-    /// scanning its assemblies, so remove that permission from the generated
-    /// Gradle library immediately before packaging the APK.
+    /// Online radio requires network access. Keep the permission explicit even
+    /// when Unity's automatic assembly scan does not detect the Android player.
     /// </summary>
     public sealed class AndroidManifestPostprocessor : IPostGenerateGradleAndroidProject
     {
@@ -25,16 +23,21 @@ namespace SortingStation.EditorTools
             if (document.Root == null) return;
 
             XNamespace android = "http://schemas.android.com/apk/res/android";
-            XElement[] internetPermissions = document.Root
-                .Elements("uses-permission")
-                .Where(element => (string)element.Attribute(android + "name") == "android.permission.INTERNET")
-                .ToArray();
-            foreach (XElement permission in internetPermissions) permission.Remove();
-
-            if (internetPermissions.Length > 0)
+            bool hasInternet = false;
+            foreach (XElement permission in document.Root.Elements("uses-permission"))
             {
+                if ((string)permission.Attribute(android + "name") == "android.permission.INTERNET")
+                {
+                    hasInternet = true;
+                    break;
+                }
+            }
+            if (!hasInternet)
+            {
+                document.Root.AddFirst(new XElement("uses-permission",
+                    new XAttribute(android + "name", "android.permission.INTERNET")));
                 document.Save(manifestPath);
-                Debug.Log("Removed unused Android INTERNET permission for the offline game.");
+                Debug.Log("Added Android INTERNET permission for online radio.");
             }
         }
     }

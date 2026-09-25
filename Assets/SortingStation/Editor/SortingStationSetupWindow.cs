@@ -8,7 +8,7 @@ namespace SortingStation.EditorTools
     /// <summary>One place for the project's commonly edited game data.</summary>
     public sealed class SortingStationSetupWindow : EditorWindow
     {
-        private enum Section { General, Cab, Environment, Audio, Levels }
+        private enum Section { General, Cab, Environment, Journey, Audio, Levels }
 
         private readonly Dictionary<int, UnityEditor.Editor> editors = new Dictionary<int, UnityEditor.Editor>();
         private readonly List<string> validationIssues = new List<string>();
@@ -30,7 +30,7 @@ namespace SortingStation.EditorTools
         {
             DrawHeader();
             section = (Section)GUILayout.Toolbar((int)section,
-                new[] { "Общие", "Кабина", "Окружение", "Звук и радио", "Уровни" }, GUILayout.Height(30f));
+                new[] { "Общие", "Кабина", "Окружение", "Сезоны и путь", "Звук и радио", "Уровни" }, GUILayout.Height(30f));
             EditorGUILayout.Space(6f);
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
@@ -53,6 +53,12 @@ namespace SortingStation.EditorTools
                     DrawAsset("Каталог окружения", Load<CabSceneryCatalog>("CabSceneryCatalog"));
                     foreach (RouteSegmentDefinition route in FindAssets<RouteSegmentDefinition>("Assets/SortingStation/Data/CabRoutes"))
                         DrawAsset("Сегмент: " + route.DisplayName, route);
+                    break;
+                case Section.Journey:
+                    EditorGUILayout.HelpBox(
+                        "Здесь настраиваются сезоны, 12-минутный цикл суток, погода, мягкие события, знаки и светофоры.",
+                        MessageType.Info);
+                    DrawAsset("Сезоны и атмосфера", Load<CabEnvironmentCatalog>("CabEnvironmentCatalog"));
                     break;
                 case Section.Audio:
                     EditorGUILayout.HelpBox(

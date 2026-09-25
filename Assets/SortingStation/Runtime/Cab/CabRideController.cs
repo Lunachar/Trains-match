@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -13,6 +14,9 @@ namespace SortingStation
         private AppServices services;
         private CabMotionModel motion;
         private CabWorldRenderer world;
+        private CabJourneyDirector journey;
+        private CabInteractionDirector interactions;
+        private CabStationStopDirector stationStop;
         private RectTransform root;
         private RectTransform stage;
         private RectTransform cabInterior;
@@ -20,17 +24,35 @@ namespace SortingStation
         private readonly Dictionary<CabControlAction, AccessibleButton> controls = new Dictionary<CabControlAction, AccessibleButton>();
         private readonly Dictionary<CabControlAction, Image> controlArtwork = new Dictionary<CabControlAction, Image>();
         private TextMeshProUGUI status;
+        private TextMeshProUGUI statusCursor;
         private TextMeshProUGUI speedDisplay;
         private TextMeshProUGUI radioDisplay;
         private TextMeshProUGUI radioTrackTitle;
         private TextMeshProUGUI radioTime;
+        private TextMeshProUGUI radioState;
+        private RectTransform radioPlayer;
         private RectTransform radioPlaylist;
+        private ScrollRect radioPlaylistScroll;
+        private RectTransform radioPlaylistViewport;
+        private RectTransform radioPlaylistContent;
+        private Scrollbar radioPlaylistScrollbar;
         private AccessibleButton radioPowerButton;
         private AccessibleButton radioPlaylistButton;
+        private AccessibleButton onlineRadioButton;
+        private AccessibleButton radioVolumeButton;
         private Image radioNightGlow;
+        private Image radioStateLamp;
+        private Image radioProgressFill;
         private RectTransform radioPlayGlyph;
         private RectTransform radioPauseGlyph;
+        private RectTransform radioPlaylistGlyph;
+        private RectTransform onlineRadioGlyph;
+        private readonly List<AccessibleButton> radioTrackButtons = new List<AccessibleButton>(4);
+        private readonly List<TextMeshProUGUI> radioTrackLabels = new List<TextMeshProUGUI>(12);
+        private readonly List<RectTransform> radioEqualizerBars = new List<RectTransform>(5);
         private bool playlistOpen;
+        private Vector2Int lastRadioLayoutScreenSize = new Vector2Int(-1, -1);
+        private Rect lastRadioLayoutSafeArea = new Rect(-1f, -1f, -1f, -1f);
         private TextMeshProUGUI routeDisplay;
         private Image headlightGlow;
         private Image cabinGlow;
@@ -56,6 +78,7 @@ namespace SortingStation
         private bool cabinLight;
         private bool wipers;
         private bool radio;
+        private bool windowHeater;
         private bool pointerBrake;
         private float pointerBrakeStrength;
         private float brakePulseUntil;
@@ -74,6 +97,13 @@ namespace SortingStation
         private float vigilanceDeadline;
         private float nextVigilanceBeep;
         private int trainNumber;
+        private WeatherType lastDispatcherWeather = (WeatherType)(-1);
+        private bool throttleGripPressed;
+
+        public static Rect StatusDisplayRect => new Rect(0.585f, 0.345f, 0.120f, 0.100f);
+        public static Rect SpeedDisplayRect => new Rect(0.720f, 0.365f, 0.135f, 0.110f);
+
+        public event Action<CabControlAction> ControlActivated;
 
         private void Start()
         {
@@ -88,6 +118,8 @@ namespace SortingStation
         private void Update()
         {
             float dt = Time.unscaledDeltaTime;
+            UpdateRadioPlayerLayout();
+            UpdateTerminalCursor();
             bool keyboardBrake = false;
             Keyboard keyboard = Keyboard.current;
             HandleDirectShortcuts(keyboard);
@@ -98,10 +130,16 @@ namespace SortingStation
             }
 
             UpdateVigilance();
-            float brake01 = automaticStop ? 1f : pointerBrake ? pointerBrakeStrength : keyboardBrake || Time.unscaledTime < brakePulseUntil ? 1f : 0f;
-            motion.Step(dt, brake01);
+            RouteSegmentType segment = world != null && world.CurrentSegment != null ? world.CurrentSegment.Type : RouteSegmentType.Meadow;
+            stationStop?.Step(motion.Speed01, dt, segment, world != null && world.TunnelBlend > 0.05f,
+                vigilanceAlarm || automaticStop);
+            float manualBrake = pointerBrake ? pointerBrakeStrength : keyboardBrake || Time.unscaledTime < brakePulseUntil ? 1f : 0f;
+            float brake01 = automaticStop ? 1f : Mathf.Max(manualBrake, stationStop != null ? stationStop.BrakeStrength : 0f);
+            motion.Step(dt, brake01, stationStop != null ? stationStop.TractionMultiplier : 1f);
             services.Audio.SetRails(motion.Speed01);
             world.Advance(motion.Speed01, motion.Acceleration01, dt);
+            journey?.Step(motion.Speed01, dt, headlights, wipers);
+            interactions?.Step(motion.Speed01, dt);
             UpdateInstruments();
             UpdateLighting(dt);
             AnimateWipers(dt);
@@ -116,9 +154,23 @@ namespace SortingStation
         private void OnDestroy()
         {
             if (services == null) return;
+            if (world != null)
+            {
+                world.SegmentChanged -= OnSegmentChanged;
+                world.AmbientSoundRequested -= OnAmbientSoundRequested;
+            }
             services.Audio.SetRails(0f);
+            services.Audio.SetWeather(WeatherType.Clear, 0f);
             services.Audio.SetRadio(false);
+            services.Audio.SetOnlineRadio(false);
             services.Speech.Stop();
+        }
+
+        private void OnAmbientSoundRequested(CabAmbientSoundRequest request)
+        {
+            services.Audio.PlayAmbient(request.Cue, request.SuggestedDurationSeconds);
+            if (request.Cue == CabAmbientSound.City)
+                services.Audio.PlayDispatcher(DispatcherVoiceCue.EnteringCity);
         }
 
         public void ConfigureSmokeDemo(bool tunnel)
@@ -149,6 +201,52 @@ namespace SortingStation
             world.SetPreviewSegment(type, progress);
         }
 
+        public void ConfigureWeatherPreview(bool enableWipers)
+        {
+            ConfigureSmokeDemo(false);
+            motion.SetThrottle(0f);
+            UpdateThrottleVisual();
+            wipers = enableWipers;
+            UpdateToggleVisual(CabControlAction.Wipers, wipers);
+            journey?.SetPreviewWeather(WeatherType.Rain, 1f);
+        }
+
+        public void ConfigureRadioUiPreview()
+        {
+            departureAuthorized = true;
+            vigilanceAlarm = false;
+            automaticStop = false;
+            if (dispatcherButton != null) dispatcherButton.gameObject.SetActive(false);
+            motion.SetThrottle(0.56f);
+            UpdateThrottleVisual();
+            radio = true;
+            services.Audio.SetRadio(true);
+            playlistOpen = true;
+            if (radioPlaylist != null) radioPlaylist.gameObject.SetActive(true);
+            UpdateRadioPlayer();
+        }
+
+        public void ConfigureAutumnLeafPreview(bool enableWipers)
+        {
+            ConfigureSmokeDemo(false);
+            wipers = enableWipers;
+            UpdateToggleVisual(CabControlAction.Wipers, wipers);
+            journey?.SetAutumnLeafPreview(true);
+        }
+
+        public void ConfigureSceneryPreview(RouteSegmentType type, float progress, float distance)
+        {
+            ConfigureTrackPreview(type, progress);
+            world.SetPreviewDistance(distance);
+        }
+
+        public void ConfigureSceneryPreviewAtSpeed(RouteSegmentType type, float progress, float distance, float throttle)
+        {
+            ConfigureSceneryPreview(type, progress, distance);
+            motion.SetThrottle(Mathf.Clamp01(throttle));
+            UpdateThrottleVisual();
+        }
+
         private void Build()
         {
             Canvas canvas;
@@ -173,6 +271,14 @@ namespace SortingStation
             world = stage.gameObject.AddComponent<CabWorldRenderer>();
             world.Initialize(stage, services.Visuals.cabLandscape, services.CabRide, services.CabScenery, services.Preferences);
             world.SegmentChanged += OnSegmentChanged;
+            world.AmbientSoundRequested += OnAmbientSoundRequested;
+            SeasonType selectedSeason = services.Session.ResolveSeason(services.Preferences.seasonMode,
+                services.CabRide.RouteSeed + services.Session.ReplaySeed * 7919);
+            journey = stage.gameObject.AddComponent<CabJourneyDirector>();
+            journey.Initialize(world, services.CabRide, services.CabEnvironment, selectedSeason, services.Preferences,
+                services.CabRide.RouteSeed + services.Session.ReplaySeed * 7919);
+            journey.StatusRequested += OnJourneyStatus;
+            journey.WeatherChanged += OnJourneyWeather;
 
             BuildHeadlightLayer();
             BuildCabInterior();
@@ -195,11 +301,34 @@ namespace SortingStation
             BuildRadioPlayer();
             BuildKeychainInteraction();
             BuildHeader();
+            BuildGentleInteractions();
             UpdateThrottleVisual();
             UpdateToggleVisual(CabControlAction.Headlights, false);
             UpdateToggleVisual(CabControlAction.CabinLight, false);
             UpdateToggleVisual(CabControlAction.Wipers, false);
             UpdateToggleVisual(CabControlAction.Radio, false);
+            UpdateToggleVisual(CabControlAction.Doors, false);
+            UpdateToggleVisual(CabControlAction.WindowHeater, false);
+        }
+
+        private void BuildGentleInteractions()
+        {
+            int seed = services.CabRide.RouteSeed + services.Session.ReplaySeed * 7919;
+            stationStop = stage.gameObject.AddComponent<CabStationStopDirector>();
+            stationStop.Initialize(services.CabInteractions, seed);
+            stationStop.PhaseChanged += OnStationPhaseChanged;
+            interactions = stage.gameObject.AddComponent<CabInteractionDirector>();
+            interactions.Initialize(root, services.CabInteractions, world, journey, services.Audio, services.Preferences, seed);
+        }
+
+        private void OnStationPhaseChanged(CabStationPhase phase)
+        {
+            bool open = phase == CabStationPhase.DoorsOpen;
+            UpdateToggleVisual(CabControlAction.Doors, open);
+            if (phase == CabStationPhase.Approaching) SetStatus("Впереди станция. Плавная остановка");
+            else if (phase == CabStationPhase.WaitingForDoors) SetStatus("Станция. Можно открыть двери");
+            else if (phase == CabStationPhase.DoorsOpen) SetStatus("Двери открыты");
+            else if (phase == CabStationPhase.Releasing) SetStatus("Двери закрыты. Можно продолжать путь");
         }
 
         private void BuildHeadlightLayer()
@@ -346,17 +475,62 @@ namespace SortingStation
         private void BuildDisplays()
         {
             AppSettings theme = services.Settings;
-            status = UiFactory.Label("CabStatus", cabInterior, string.Empty, theme.CaptionFontSize,
-                new Color(0.68f, 0.91f, 1f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
-            UiFactory.SetRect(status.rectTransform, new Vector2(0.585f, 0.345f), new Vector2(0.705f, 0.445f), Vector2.zero, Vector2.zero);
+            RectTransform statusScreen = BuildTerminalScreen("CabStatusScreen", StatusDisplayRect, -3.2f);
+            status = UiFactory.Label("CabStatus", statusScreen, string.Empty, theme.CaptionFontSize,
+                TerminalGreen(), TextAlignmentOptions.Center, UiFontRole.Body);
+            UiFactory.Stretch(status.rectTransform, 8f, 5f, 20f, 5f);
+            ApplyTerminalText(status, false);
+            statusCursor = UiFactory.Label("CabStatusCursor", statusScreen, "|", theme.CaptionFontSize,
+                TerminalGreen(), TextAlignmentOptions.MidlineRight, UiFontRole.Body);
+            UiFactory.SetRect(statusCursor.rectTransform, new Vector2(0.88f, 0.14f), new Vector2(0.98f, 0.88f), Vector2.zero, Vector2.zero);
+            ApplyTerminalText(statusCursor, false);
 
-            speedDisplay = UiFactory.Label("SpeedDisplay", cabInterior, "0 км/ч", theme.ControlFontSize,
-                new Color(0.63f, 0.93f, 1f, 1f), TextAlignmentOptions.Center, UiFontRole.Control);
-            UiFactory.SetRect(speedDisplay.rectTransform, new Vector2(0.72f, 0.365f), new Vector2(0.855f, 0.475f), Vector2.zero, Vector2.zero);
+            RectTransform speedScreen = BuildTerminalScreen("SpeedScreen", SpeedDisplayRect, 1.4f);
+            speedDisplay = UiFactory.Label("SpeedDisplay", speedScreen, "0 км/ч", theme.ControlFontSize,
+                TerminalGreen(), TextAlignmentOptions.Center, UiFontRole.Control);
+            UiFactory.Stretch(speedDisplay.rectTransform, 7f, 4f, 7f, 4f);
+            ApplyTerminalText(speedDisplay, true);
 
             radioDisplay = UiFactory.Label("RadioDisplay", cabInterior, "Радио выключено", theme.CaptionFontSize,
                 new Color(0.70f, 0.93f, 0.83f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
             UiFactory.SetRect(radioDisplay.rectTransform, new Vector2(0.365f, 0.335f), new Vector2(0.478f, 0.425f), Vector2.zero, Vector2.zero);
+        }
+
+        private RectTransform BuildTerminalScreen(string name, Rect rect, float rotationDegrees)
+        {
+            RectTransform screen = UiFactory.Panel(name, cabInterior, new Color(0.005f, 0.038f, 0.018f, 0.84f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(screen, rect.min, rect.max, Vector2.zero, Vector2.zero);
+            screen.localRotation = Quaternion.Euler(0f, 0f, rotationDegrees);
+            Image image = screen.GetComponent<Image>();
+            image.raycastTarget = false;
+            Outline outline = screen.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(0.18f, 0.96f, 0.36f, 0.28f);
+            outline.effectDistance = new Vector2(1f, -1f);
+            Shadow glow = screen.gameObject.AddComponent<Shadow>();
+            glow.effectColor = new Color(0.02f, 0.95f, 0.18f, 0.18f);
+            glow.effectDistance = new Vector2(0f, 0f);
+            return screen;
+        }
+
+        private static Color TerminalGreen()
+        {
+            return new Color(0.47f, 1f, 0.31f, 1f);
+        }
+
+        private static void ApplyTerminalText(TextMeshProUGUI label, bool speed)
+        {
+            if (label == null) return;
+            label.characterSpacing = speed ? 2f : 1.5f;
+            label.fontStyle = speed ? FontStyles.Bold : FontStyles.Normal;
+            label.outlineColor = new Color(0f, 0.32f, 0.05f, 0.85f);
+            label.outlineWidth = 0.14f;
+            label.enableWordWrapping = true;
+        }
+
+        private void UpdateTerminalCursor()
+        {
+            if (statusCursor == null) return;
+            statusCursor.gameObject.SetActive(Mathf.Repeat(Time.unscaledTime, 1.05f) < 0.58f);
         }
 
         private void BuildControls()
@@ -370,7 +544,7 @@ namespace SortingStation
             for (int i = 0; i < bindings.Length; i++)
             {
                 CabControlBinding binding = bindings[i];
-                if (binding.action == CabControlAction.Radio) continue;
+                if (binding.action == CabControlAction.Radio || binding.action == CabControlAction.Throttle) continue;
                 // The whole rectangle remains a large accessible hit target, while the
                 // visible control is a compact instrument fitted into the photographed panel.
                 Color idle = new Color(0.035f, 0.045f, 0.050f, 0.68f);
@@ -434,25 +608,7 @@ namespace SortingStation
                 controls[binding.action] = button;
             }
 
-            AccessibleButton throttleButton = controls[CabControlAction.Throttle];
-            throttleButton.PointerDragged += SetThrottleFromPointer;
-            Image throttleTrack = UiFactory.Image("ThrottleTrack", throttleButton.transform, UiFactory.RoundedSprite(),
-                WithAlpha(theme.PanelColor, 0.86f), false);
-            throttleTrack.type = Image.Type.Sliced;
-            throttleTrack.raycastTarget = false;
-            throttleTrack.rectTransform.anchorMin = new Vector2(0.84f, 0.16f);
-            throttleTrack.rectTransform.anchorMax = new Vector2(0.84f, 0.84f);
-            throttleTrack.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            throttleTrack.rectTransform.sizeDelta = new Vector2(10f, 0f);
-            throttleTrack.rectTransform.anchoredPosition = Vector2.zero;
-            throttleGrip = UiFactory.Image("ThrottleGrip", throttleButton.transform, null, theme.AccentColor, false);
-            throttleGrip.sprite = UiFactory.RoundedSprite();
-            throttleGrip.type = Image.Type.Sliced;
-            throttleGrip.raycastTarget = false;
-            throttleGrip.rectTransform.anchorMin = throttleGrip.rectTransform.anchorMax = new Vector2(0.84f, 0.15f);
-            throttleGrip.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            throttleGrip.rectTransform.sizeDelta = new Vector2(32f, 32f);
-            throttleGrip.rectTransform.anchoredPosition = Vector2.zero;
+            BuildThrottleSlider();
 
             AccessibleButton brakeButton = controls[CabControlAction.Brake];
             brakeButton.PointerPressed += BeginBrake;
@@ -475,55 +631,214 @@ namespace SortingStation
             brakeGrip.rectTransform.sizeDelta = new Vector2(32f, 32f);
             brakeGrip.rectTransform.anchoredPosition = Vector2.zero;
 
-            CreateThrottleStepButton("ThrottleMinus", "−", new Vector2(0.455f, 0.135f), new Vector2(0.535f, 0.255f), -1f);
-            CreateThrottleStepButton("ThrottlePlus", "+", new Vector2(0.56f, 0.135f), new Vector2(0.64f, 0.255f), 1f);
+        }
+
+        private void BuildThrottleSlider()
+        {
+            AppSettings theme = services.Settings;
+            AccessibleButton slider = UiFactory.Button("Throttle", stage, focusGroup, string.Empty,
+                Color.clear, Color.clear, () => { }, theme.CaptionFontSize);
+            Vector2 sliderMin = new Vector2(0.365f, 0.12f);
+            Vector2 sliderMax = new Vector2(0.895f, 0.25f);
+            if (TryGetControlRect(CabControlAction.Throttle, out Vector2 configuredSliderMin, out Vector2 configuredSliderMax))
+            {
+                sliderMin = configuredSliderMin;
+                sliderMax = configuredSliderMax;
+            }
+            UiFactory.SetRect(slider.RectTransform, sliderMin, sliderMax, Vector2.zero, Vector2.zero);
+            slider.ConfigurePersistentPress(false, 0f);
+            slider.SetPressScale(1f);
+            slider.SetAccessibleName("Тяга 0 процентов. Проведите пальцем вдоль нижнего ползунка.");
+            slider.PointerPressed += SetThrottleFromPointer;
+            slider.PointerDragged += SetThrottleFromPointer;
+            slider.PointerPressed += _ => SetThrottleGripPressed(true);
+            slider.PointerReleased += _ => SetThrottleGripPressed(false);
+            slider.Label.alignment = TextAlignmentOptions.Top;
+            slider.Label.gameObject.SetActive(true);
+            UiFactory.SetRect(slider.Label.rectTransform, new Vector2(0.34f, 0.63f), new Vector2(0.66f, 0.98f),
+                Vector2.zero, Vector2.zero);
+            controls[CabControlAction.Throttle] = slider;
+
+            Sprite trackSprite = services.CabScenery != null ? services.CabScenery.ThrottleSliderTrack : null;
+            Image track = UiFactory.Image("ThrottleSliderTrack", slider.transform,
+                trackSprite != null ? trackSprite : UiFactory.RoundedSprite(), Color.white, false);
+            track.type = trackSprite != null ? Image.Type.Simple : Image.Type.Sliced;
+            track.raycastTarget = false;
+            UiFactory.SetRect(track.rectTransform, new Vector2(0.035f, 0.02f), new Vector2(0.965f, 0.73f),
+                Vector2.zero, Vector2.zero);
+            RectTransform groove = UiFactory.Panel("ThrottleGroove", slider.transform,
+                new Color(0.015f, 0.045f, 0.055f, 0.84f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(groove, new Vector2(0.095f, 0.25f), new Vector2(0.905f, 0.48f), Vector2.zero, Vector2.zero);
+            groove.GetComponent<Image>().raycastTarget = false;
+
+            TextMeshProUGUI zero = UiFactory.Label("ThrottleZero", slider.transform, "0", theme.CaptionFontSize,
+                theme.TextColor, TextAlignmentOptions.MidlineLeft, UiFontRole.Control);
+            UiFactory.SetRect(zero.rectTransform, new Vector2(0.055f, 0.04f), new Vector2(0.13f, 0.42f), Vector2.zero, Vector2.zero);
+            TextMeshProUGUI full = UiFactory.Label("ThrottleFull", slider.transform, "100", theme.CaptionFontSize,
+                theme.TextColor, TextAlignmentOptions.MidlineRight, UiFontRole.Control);
+            UiFactory.SetRect(full.rectTransform, new Vector2(0.87f, 0.04f), new Vector2(0.945f, 0.42f), Vector2.zero, Vector2.zero);
+
+            Sprite handleSprite = services.CabScenery != null ? services.CabScenery.ThrottleSliderHandle : null;
+            throttleGrip = UiFactory.Image("ThrottleSliderHandle", slider.transform,
+                handleSprite != null ? handleSprite : UiFactory.RoundedSprite(),
+                handleSprite != null ? Color.white : theme.AccentColor, true);
+            throttleGrip.raycastTarget = false;
+            throttleGrip.rectTransform.anchorMin = throttleGrip.rectTransform.anchorMax = new Vector2(0.11f, 0.35f);
+            throttleGrip.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            throttleGrip.rectTransform.sizeDelta = new Vector2(164f, 150f);
+            throttleGrip.rectTransform.anchoredPosition = Vector2.zero;
+            throttleGrip.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            RectTransform gripCore = UiFactory.Panel("GripCore", throttleGrip.transform,
+                new Color(0.055f, 0.075f, 0.08f, 0.94f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(gripCore, new Vector2(0.10f, 0.34f), new Vector2(0.90f, 0.66f), Vector2.zero, Vector2.zero);
+            gripCore.GetComponent<Image>().raycastTarget = false;
+            RectTransform gripMark = UiFactory.Panel("GripMark", gripCore,
+                new Color(1f, 0.62f, 0.08f, 0.96f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(gripMark, new Vector2(0.46f, 0.08f), new Vector2(0.54f, 0.92f), Vector2.zero, Vector2.zero);
+            gripMark.GetComponent<Image>().raycastTarget = false;
+        }
+
+        private void SetThrottleGripPressed(bool value)
+        {
+            throttleGripPressed = value;
+            UpdateThrottleGripPressVisual();
         }
 
         private void BuildRadioPlayer()
         {
             AppSettings theme = services.Settings;
-            Sprite playerSkin = services.CabScenery != null ? services.CabScenery.RadioPlayerSkin : null;
-            RectTransform player = UiFactory.Panel("RetroRadioPlayer", cabInterior,
-                playerSkin != null ? Color.white : new Color(0.025f, 0.055f, 0.07f, 0.94f),
-                playerSkin != null ? playerSkin : UiFactory.RoundedSprite());
-            UiFactory.SetRect(player, new Vector2(0.018f, 0.275f), new Vector2(0.265f, 0.575f), Vector2.zero, Vector2.zero);
-            Image playerImage = player.GetComponent<Image>();
+            // The radio lives on the stable stage, not inside the swaying cabin layer.
+            // Its surface is built from controls only, so no obsolete player baked into an image can show through.
+            radioPlayer = UiFactory.Panel("RetroRadioPlayer", stage,
+                new Color(0.025f, 0.070f, 0.088f, 0.985f), UiFactory.RoundedSprite());
+            Image playerImage = radioPlayer.GetComponent<Image>();
             playerImage.preserveAspect = false;
-            if (playerSkin == null) UiFactory.StyleSurface(player, false);
-            radioNightGlow = UiFactory.Image("RadioNightGlow", player, UiFactory.RoundedSprite(), new Color(0.35f, 1f, 0.22f, 0.08f), false);
+            UiFactory.StyleSurface(radioPlayer, true);
+            radioNightGlow = UiFactory.Image("RadioNightGlow", radioPlayer, UiFactory.RoundedSprite(), new Color(0.40f, 0.84f, 0.96f, 0.06f), false);
             radioNightGlow.type = Image.Type.Sliced;
             radioNightGlow.raycastTarget = false;
-            UiFactory.SetRect(radioNightGlow.rectTransform, new Vector2(-0.035f, -0.045f), new Vector2(1.035f, 1.045f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(radioNightGlow.rectTransform, new Vector2(-0.025f, -0.035f), new Vector2(1.025f, 1.035f), Vector2.zero, Vector2.zero);
             radioNightGlow.transform.SetAsFirstSibling();
 
-            TextMeshProUGUI heading = UiFactory.Label("RadioHeading", player, "РАДИО • МАРШРУТ", theme.CaptionFontSize,
-                new Color(0.65f, 1f, 0.58f, 1f), TextAlignmentOptions.Center, UiFontRole.Control);
-            UiFactory.SetRect(heading.rectTransform, new Vector2(0.10f, 0.73f), new Vector2(0.90f, 0.86f), Vector2.zero, Vector2.zero);
-            radioTrackTitle = UiFactory.Label("TrackTitle", player, "Радио выключено", theme.CaptionFontSize,
-                new Color(0.80f, 1f, 0.72f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
+            RectTransform display = UiFactory.Panel("RadioDisplaySurface", radioPlayer, new Color(0.008f, 0.035f, 0.045f, 0.90f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(display, new Vector2(0.075f, 0.545f), new Vector2(0.925f, 0.895f), Vector2.zero, Vector2.zero);
+            display.GetComponent<Image>().raycastTarget = false;
+
+            TextMeshProUGUI heading = UiFactory.Label("RadioHeading", display, "РАДИО", theme.CaptionFontSize,
+                new Color(0.76f, 0.91f, 0.96f, 1f), TextAlignmentOptions.MidlineLeft, UiFontRole.Control);
+            UiFactory.SetRect(heading.rectTransform, new Vector2(0.055f, 0.73f), new Vector2(0.46f, 0.95f), Vector2.zero, Vector2.zero);
+            radioStateLamp = UiFactory.Image("RadioStateLamp", display, UiFactory.RoundedSprite(), theme.MutedTextColor, false);
+            radioStateLamp.rectTransform.anchorMin = radioStateLamp.rectTransform.anchorMax = new Vector2(0.59f, 0.84f);
+            radioStateLamp.rectTransform.sizeDelta = new Vector2(14f, 14f);
+            radioStateLamp.raycastTarget = false;
+            radioState = UiFactory.Label("RadioState", display, "ВЫКЛ.", theme.CaptionFontSize,
+                theme.MutedTextColor, TextAlignmentOptions.MidlineRight, UiFontRole.Control);
+            UiFactory.SetRect(radioState.rectTransform, new Vector2(0.63f, 0.73f), new Vector2(0.945f, 0.95f), Vector2.zero, Vector2.zero);
+
+            radioTrackTitle = UiFactory.Label("TrackTitle", display, "Выберите трек", theme.CaptionFontSize,
+                theme.TextColor, TextAlignmentOptions.MidlineLeft, UiFontRole.Body);
             radioTrackTitle.enableWordWrapping = false;
             radioTrackTitle.overflowMode = TextOverflowModes.Ellipsis;
-            UiFactory.SetRect(radioTrackTitle.rectTransform, new Vector2(0.10f, 0.60f), new Vector2(0.90f, 0.72f), Vector2.zero, Vector2.zero);
-            radioTime = UiFactory.Label("TrackTime", player, "00:00 - 00:00", theme.CaptionFontSize,
-                new Color(0.47f, 0.84f, 0.61f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
-            UiFactory.SetRect(radioTime.rectTransform, new Vector2(0.10f, 0.50f), new Vector2(0.90f, 0.60f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(radioTrackTitle.rectTransform, new Vector2(0.055f, 0.42f), new Vector2(0.945f, 0.72f), Vector2.zero, Vector2.zero);
+            radioTime = UiFactory.Label("TrackTime", display, "00:00 — 00:00", theme.CaptionFontSize,
+                new Color(0.66f, 0.82f, 0.88f, 1f), TextAlignmentOptions.MidlineRight, UiFontRole.Body);
+            UiFactory.SetRect(radioTime.rectTransform, new Vector2(0.52f, 0.14f), new Vector2(0.945f, 0.40f), Vector2.zero, Vector2.zero);
 
-            radioPowerButton = RadioButton("RadioPower", player, string.Empty, new Vector2(0.405f, 0.29f), new Vector2(0.595f, 0.49f), ToggleRadio, "Радио: включить или поставить на паузу");
+            RectTransform progressTrack = UiFactory.Panel("RadioProgressTrack", display, new Color(0.18f, 0.31f, 0.35f, 0.92f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(progressTrack, new Vector2(0.055f, 0.095f), new Vector2(0.945f, 0.16f), Vector2.zero, Vector2.zero);
+            progressTrack.GetComponent<Image>().raycastTarget = false;
+            radioProgressFill = UiFactory.Image("RadioProgressFill", progressTrack, UiFactory.RoundedSprite(), theme.PrimaryColor, false);
+            radioProgressFill.type = Image.Type.Sliced;
+            radioProgressFill.raycastTarget = false;
+            UiFactory.SetRect(radioProgressFill.rectTransform, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, Vector2.zero);
+
+            for (int i = 0; i < 5; i++)
+            {
+                RectTransform bar = UiFactory.Panel("Equalizer_" + i, display, theme.SelectedColor, UiFactory.RoundedSprite());
+                bar.anchorMin = bar.anchorMax = new Vector2(0.075f + i * 0.055f, 0.25f);
+                bar.pivot = new Vector2(0.5f, 0f);
+                bar.sizeDelta = new Vector2(9f, 16f);
+                bar.GetComponent<Image>().raycastTarget = false;
+                radioEqualizerBars.Add(bar);
+            }
+
+            radioPowerButton = RadioButton("RadioPower", radioPlayer, string.Empty, new Vector2(0.37f, 0.245f), new Vector2(0.63f, 0.54f), ToggleRadio, "Включить радио");
             radioPlayGlyph = CreateRadioGlyph(radioPowerButton, "play");
             radioPauseGlyph = CreateRadioGlyph(radioPowerButton, "pause");
-            AccessibleButton previous = RadioButton("RadioPrevious", player, string.Empty, new Vector2(0.20f, 0.29f), new Vector2(0.38f, 0.49f), PreviousRadioTrack, "Предыдущий трек");
+            AccessibleButton previous = RadioButton("RadioPrevious", radioPlayer, string.Empty, new Vector2(0.08f, 0.245f), new Vector2(0.34f, 0.54f), PreviousRadioTrack, "Включить предыдущий трек");
             CreateRadioGlyph(previous, "previous");
-            AccessibleButton next = RadioButton("RadioNext", player, string.Empty, new Vector2(0.62f, 0.29f), new Vector2(0.80f, 0.49f), NextRadioTrack, "Следующий трек");
+            AccessibleButton next = RadioButton("RadioNext", radioPlayer, string.Empty, new Vector2(0.66f, 0.245f), new Vector2(0.92f, 0.54f), NextRadioTrack, "Включить следующий трек");
             CreateRadioGlyph(next, "next");
-            radioPlaylistButton = RadioButton("RadioPlaylist", player, string.Empty, new Vector2(0.27f, 0.12f), new Vector2(0.73f, 0.27f), TogglePlaylist, "Открыть список треков");
-            CreateRadioGlyph(radioPlaylistButton, "playlist");
+            radioPlaylistButton = RadioButton("RadioPlaylist", radioPlayer, string.Empty, new Vector2(0.08f, 0.035f), new Vector2(0.58f, 0.225f), TogglePlaylist, "Открыть список треков");
+            radioPlaylistGlyph = CreateRadioGlyph(radioPlaylistButton, "playlist");
+            radioVolumeButton = RadioButton("RadioVolume", radioPlayer, "60%", new Vector2(0.61f, 0.035f), new Vector2(0.745f, 0.225f), ToggleRadioMusicVolume, "Громкость песен и радио 60 процентов", true);
+            radioVolumeButton.Label.alignment = TextAlignmentOptions.Center;
+            radioVolumeButton.Label.margin = Vector4.zero;
+            onlineRadioButton = RadioButton("OnlineRadio", radioPlayer, string.Empty, new Vector2(0.765f, 0.035f), new Vector2(0.92f, 0.225f), ToggleOnlineRadio, "Включить Детское онлайн-радио");
+            onlineRadioGlyph = CreateRadioGlyph(onlineRadioButton, "online");
 
-            radioPlaylist = UiFactory.Panel("RadioPlaylist", cabInterior, new Color(0.02f, 0.04f, 0.055f, 0.96f), UiFactory.RoundedSprite());
-            UiFactory.SetRect(radioPlaylist, new Vector2(0.018f, 0.075f), new Vector2(0.265f, 0.27f), Vector2.zero, Vector2.zero);
-            UiFactory.StyleSurface(radioPlaylist, false);
+            radioPlaylist = UiFactory.Panel("RadioPlaylist", stage, new Color(0.025f, 0.070f, 0.088f, 0.99f), UiFactory.RoundedSprite());
+            UiFactory.StyleSurface(radioPlaylist, true);
+            BuildPlaylistSurface();
             radioPlaylist.gameObject.SetActive(false);
             BuildPlaylistEntries();
+            UpdateRadioPlayerLayout(true);
             UpdateRadioPlayer();
+        }
+
+        private void UpdateRadioPlayerLayout(bool force = false)
+        {
+            if (radioPlayer == null || root == null) return;
+            Vector2Int screenSize = new Vector2Int(Screen.width, Screen.height);
+            Rect safeArea = Screen.safeArea;
+            if (!force && screenSize == lastRadioLayoutScreenSize && safeArea == lastRadioLayoutSafeArea) return;
+            lastRadioLayoutScreenSize = screenSize;
+            lastRadioLayoutSafeArea = safeArea;
+            float aspect = safeArea.height > 1f ? safeArea.width / safeArea.height : 1.5f;
+            Vector2 visibleMargins = CabStageVisibleMargins(aspect);
+            // Keep the player visually in the lower-left corner, but leave enough room for its
+            // rounded glow and shadow after the 3:2 cab stage is vertically cropped on 16:9.
+            Vector2 playerMin = visibleMargins + new Vector2(0.008f, 0.035f);
+            Vector2 playerMax = playerMin + new Vector2(0.312f, 0.355f);
+            if (TryGetControlRect(CabControlAction.Radio, out Vector2 configuredPlayerMin, out Vector2 configuredPlayerMax))
+            {
+                playerMin = configuredPlayerMin;
+                playerMax = configuredPlayerMax;
+            }
+            Vector2 playerSize = playerMax - playerMin;
+            UiFactory.SetRect(radioPlayer, playerMin, playerMax, Vector2.zero, Vector2.zero);
+            if (radioPlaylist != null)
+            {
+                Vector2 playlistMin = new Vector2(playerMin.x, playerMin.y + playerSize.y + 0.012f);
+                UiFactory.SetRect(radioPlaylist, playlistMin, playlistMin + new Vector2(playerSize.x, 0.36f), Vector2.zero, Vector2.zero);
+            }
+        }
+
+        private bool TryGetControlRect(CabControlAction action, out Vector2 min, out Vector2 max)
+        {
+            min = Vector2.zero;
+            max = Vector2.zero;
+            if (services == null || services.CabRide == null) return false;
+            CabControlBinding[] bindings = services.CabRide.Controls;
+            for (int i = 0; i < bindings.Length; i++)
+            {
+                CabControlBinding binding = bindings[i];
+                if (binding == null || binding.action != action) continue;
+                Vector2 half = binding.normalizedSize * 0.5f;
+                min = binding.normalizedCenter - half;
+                max = binding.normalizedCenter + half;
+                return true;
+            }
+            return false;
+        }
+
+        public static Vector2 CabStageVisibleMargins(float parentAspect)
+        {
+            const float stageAspect = 1.5f;
+            float aspect = Mathf.Clamp(parentAspect, 0.75f, 3f);
+            float left = aspect < stageAspect ? (1f - aspect / stageAspect) * 0.5f : 0f;
+            float bottom = aspect > stageAspect ? (1f - stageAspect / aspect) * 0.5f : 0f;
+            return new Vector2(left, bottom);
         }
 
         private void BuildDispatcherButton()
@@ -548,8 +863,6 @@ namespace SortingStation
         private void PromptDeparture()
         {
             SetStatus("Диспетчер: состав №" + trainNumber + ". Подтвердите готовность красной кнопкой.");
-            services.Speech.Speak("Диспетчер. Состав номер " + trainNumber +
-                ". Дано разрешение на старт движения. Подтвердите готовность.");
         }
 
         private void AcknowledgeDispatcher()
@@ -560,8 +873,16 @@ namespace SortingStation
                 departureAuthorized = true;
                 nextVigilanceAt = Time.unscaledTime + 60f;
                 SetStatus("Диспетчер: движение разрешено. Можно набрать тягу.");
-                services.Speech.Speak("Диспетчер. Движение разрешено.");
                 dispatcherButton.SetAccessibleName("Красная кнопка диспетчера: ожидание проверки бдительности");
+                return;
+            }
+
+            if (TryReleaseAutomaticStop(departureAuthorized, ref automaticStop))
+            {
+                nextVigilanceAt = Time.unscaledTime + 120f;
+                SetStatus("Автоматическая остановка снята. Можно снова набрать тягу.");
+                dispatcherButton.SetAccessibleName("Красная кнопка диспетчера: ожидание проверки бдительности");
+                services.Audio.PlayDispatcher(DispatcherVoiceCue.VigilancePassed);
                 return;
             }
 
@@ -569,7 +890,14 @@ namespace SortingStation
             vigilanceAlarm = false;
             nextVigilanceAt = Time.unscaledTime + 120f;
             SetStatus("Бдительность подтверждена. Следующая проверка через две минуты.");
-            services.Speech.Speak("Бдительность подтверждена.");
+            services.Audio.PlayDispatcher(DispatcherVoiceCue.VigilancePassed);
+        }
+
+        public static bool TryReleaseAutomaticStop(bool departureAuthorized, ref bool automaticStop)
+        {
+            if (!departureAuthorized || !automaticStop) return false;
+            automaticStop = false;
+            return true;
         }
 
         private void UpdateVigilance()
@@ -582,7 +910,7 @@ namespace SortingStation
                 vigilanceDeadline = now + 20f;
                 nextVigilanceBeep = now;
                 SetStatus("Проверка бдительности: нажмите мигающую красную кнопку за 20 секунд.");
-                services.Speech.Speak("Проверка бдительности. Нажмите красную кнопку.");
+                services.Audio.PlayDispatcher(DispatcherVoiceCue.VigilanceCheck);
             }
             if (!vigilanceAlarm) return;
             if (now >= nextVigilanceBeep)
@@ -595,9 +923,9 @@ namespace SortingStation
             vigilanceAlarm = false;
             automaticStop = true;
             motion.SetThrottle(0f);
+            UpdateThrottleVisual();
             services.Audio.Play(SoundCue.Brake);
             SetStatus("Нет подтверждения: поезд автоматически останавливается.");
-            services.Speech.Speak("Нет подтверждения. Поезд автоматически останавливается.");
             dispatcherButton.SetAccessibleName("Красная кнопка диспетчера: поезд остановлен автоматически");
         }
 
@@ -615,14 +943,20 @@ namespace SortingStation
                 : Vector3.one;
         }
 
-        private AccessibleButton RadioButton(string name, Transform parent, string label, Vector2 min, Vector2 max, System.Action action, string accessibleName)
+        private AccessibleButton RadioButton(string name, Transform parent, string label, Vector2 min, Vector2 max,
+            System.Action action, string accessibleName, bool showLabel = false)
         {
-            AccessibleButton button = UiFactory.Button(name, parent, focusGroup, label, new Color(0.10f, 0.20f, 0.16f, 1f),
-                new Color(0.34f, 0.94f, 0.48f, 0.28f), action, services.Settings.CaptionFontSize);
+            AppSettings theme = services.Settings;
+            AccessibleButton button = UiFactory.Button(name, parent, focusGroup, label, new Color(0.035f, 0.10f, 0.13f, 0.86f),
+                theme.SelectedColor, action, theme.CaptionFontSize);
             UiFactory.SetRect(button.RectTransform, min, max, Vector2.zero, Vector2.zero);
             button.SetAccessibleName(accessibleName);
-            button.Label.gameObject.SetActive(false);
-            button.SetIdleColor(Color.clear);
+            button.Label.gameObject.SetActive(showLabel);
+            if (showLabel)
+            {
+                button.Label.alignment = TextAlignmentOptions.MidlineLeft;
+                button.Label.margin = new Vector4(22f, 8f, 18f, 8f);
+            }
             return button;
         }
 
@@ -631,9 +965,13 @@ namespace SortingStation
             RectTransform root = new GameObject("Glyph_" + kind, typeof(RectTransform)).GetComponent<RectTransform>();
             root.SetParent(button.transform, false);
             UiFactory.Stretch(root);
-            Image icon = UiFactory.Image("Icon", root, CreateRadioIconSprite(kind), new Color(0.74f, 1f, 0.70f, 1f), false);
+            Image icon = UiFactory.Image("Icon", root, CreateRadioIconSprite(kind), services.Settings.TextColor, true);
             icon.raycastTarget = false;
-            UiFactory.Stretch(icon.rectTransform, 14f, 14f, 14f, 14f);
+            icon.rectTransform.anchorMin = icon.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            icon.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            bool compact = kind == "playlist" || kind == "online";
+            icon.rectTransform.sizeDelta = new Vector2(compact ? 58f : 72f, compact ? 58f : 72f);
+            icon.rectTransform.anchoredPosition = kind == "play" ? new Vector2(3f, 0f) : Vector2.zero;
             return root;
         }
 
@@ -671,6 +1009,7 @@ namespace SortingStation
                         "next" => (x >= 71 && x <= 78 && y >= 24 && y <= 72) ||
                                   RightTriangle(x, y, 24, 50, 48, 22) || RightTriangle(x, y, 43, 69, 48, 22),
                         "playlist" => PlaylistMark(x, y),
+                        "online" => OnlineRadioMark(x, y),
                         _ => RightTriangle(x, y, 27, 70, 48, 30)
                     };
                     pixels[y * size + x] = filled ? ink : new Color32(0, 0, 0, 0);
@@ -709,32 +1048,132 @@ namespace SortingStation
             return false;
         }
 
+        private static bool OnlineRadioMark(int x, int y)
+        {
+            int dx = x - 48;
+            int dy = y - 34;
+            int distanceSquared = dx * dx + dy * dy;
+            bool lamp = distanceSquared <= 7 * 7;
+            bool mast = x >= 45 && x <= 51 && y >= 34 && y <= 67;
+            if (y < 34) return lamp || mast;
+            float distance = Mathf.Sqrt(distanceSquared);
+            bool innerWave = Mathf.Abs(distance - 22f) <= 2.8f;
+            bool outerWave = Mathf.Abs(distance - 34f) <= 2.8f;
+            return lamp || mast || innerWave || outerWave;
+        }
+
         private void BuildPlaylistEntries()
         {
             AudioClip[] tracks = services.AudioCatalog != null ? services.AudioCatalog.CabRadioPlaylist : System.Array.Empty<AudioClip>();
-            int count = Mathf.Min(4, tracks.Length);
+            int count = tracks.Length;
             for (int i = 0; i < count; i++)
             {
                 int index = i;
                 string title = tracks[i] != null ? tracks[i].name : "Пустой слот";
-                AccessibleButton entry = RadioButton("Track_" + i, radioPlaylist, (i + 1) + ". " + title,
-                    new Vector2(0.05f, 0.72f - i * 0.23f), new Vector2(0.95f, 0.91f - i * 0.23f),
-                    () => SelectRadioTrack(index), "Трек " + (i + 1) + ": " + title);
+                AccessibleButton entry = RadioButton("Track_" + i, radioPlaylistContent, (i + 1) + ". " + title,
+                    Vector2.zero, Vector2.one, () => SelectRadioTrack(index),
+                    "Включить трек " + (i + 1) + ": " + title, true);
+                entry.RectTransform.anchorMin = new Vector2(0f, 1f);
+                entry.RectTransform.anchorMax = new Vector2(1f, 1f);
+                entry.RectTransform.pivot = new Vector2(0.5f, 1f);
+                entry.RectTransform.anchoredPosition = new Vector2(-7f, -8f - i * 68f);
+                entry.RectTransform.sizeDelta = new Vector2(-22f, 60f);
+                entry.ConfigurePersistentPress(false, 0f);
                 entry.Label.enableWordWrapping = false;
                 entry.Label.overflowMode = TextOverflowModes.Ellipsis;
+                entry.Label.gameObject.SetActive(false);
+                TextMeshProUGUI rowLabel = UiFactory.Label("TrackLabel", entry.transform, (i + 1) + ". " + title,
+                    services.Settings.CaptionFontSize, services.Settings.TextColor,
+                    TextAlignmentOptions.MidlineLeft, UiFontRole.Body);
+                rowLabel.enableWordWrapping = false;
+                rowLabel.overflowMode = TextOverflowModes.Ellipsis;
+                UiFactory.Stretch(rowLabel.rectTransform, 22f, 7f, 18f, 7f);
+                radioTrackButtons.Add(entry);
+                radioTrackLabels.Add(rowLabel);
             }
+            if (radioPlaylistContent != null)
+                radioPlaylistContent.sizeDelta = new Vector2(0f, Mathf.Max(220f, 16f + count * 68f));
             if (count == 0)
             {
-                TextMeshProUGUI empty = UiFactory.Label("EmptyPlaylist", radioPlaylist, "Добавьте музыку в Audio Catalog", services.Settings.CaptionFontSize,
+                TextMeshProUGUI empty = UiFactory.Label("EmptyPlaylist", radioPlaylistViewport, "Список пуст. Треки добавляются в Audio Catalog.", services.Settings.CaptionFontSize,
                     new Color(0.72f, 0.84f, 0.78f, 1f), TextAlignmentOptions.Center, UiFontRole.Body);
                 UiFactory.SetRect(empty.rectTransform, new Vector2(0.07f, 0.2f), new Vector2(0.93f, 0.82f), Vector2.zero, Vector2.zero);
             }
+        }
+
+        private void BuildPlaylistSurface()
+        {
+            AppSettings theme = services.Settings;
+            TextMeshProUGUI title = UiFactory.Label("PlaylistHeading", radioPlaylist, "ТРЕКИ",
+                theme.CaptionFontSize, new Color(0.78f, 0.93f, 0.98f, 1f),
+                TextAlignmentOptions.MidlineLeft, UiFontRole.Control);
+            UiFactory.SetRect(title.rectTransform, new Vector2(0.06f, 0.86f), new Vector2(0.78f, 0.98f), Vector2.zero, Vector2.zero);
+
+            radioPlaylistViewport = UiFactory.Panel("PlaylistViewport", radioPlaylist,
+                new Color(0.008f, 0.032f, 0.042f, 0.94f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(radioPlaylistViewport, new Vector2(0.04f, 0.055f), new Vector2(0.91f, 0.85f),
+                Vector2.zero, Vector2.zero);
+            radioPlaylistViewport.gameObject.AddComponent<RectMask2D>();
+
+            radioPlaylistContent = UiFactory.Panel("PlaylistContent", radioPlaylistViewport, Color.clear);
+            radioPlaylistContent.anchorMin = new Vector2(0f, 1f);
+            radioPlaylistContent.anchorMax = new Vector2(1f, 1f);
+            radioPlaylistContent.pivot = new Vector2(0.5f, 1f);
+            radioPlaylistContent.anchoredPosition = Vector2.zero;
+            radioPlaylistContent.sizeDelta = new Vector2(0f, 220f);
+            radioPlaylistContent.GetComponent<Image>().raycastTarget = false;
+
+            RectTransform scrollbarRect = UiFactory.Panel("PlaylistScrollbar", radioPlaylist,
+                new Color(0.14f, 0.28f, 0.32f, 0.95f), UiFactory.RoundedSprite());
+            UiFactory.SetRect(scrollbarRect, new Vector2(0.925f, 0.07f), new Vector2(0.972f, 0.84f), Vector2.zero, Vector2.zero);
+            RectTransform slidingArea = UiFactory.Panel("SlidingArea", scrollbarRect, Color.clear);
+            UiFactory.Stretch(slidingArea, 5f, 5f, 5f, 5f);
+            RectTransform handle = UiFactory.Panel("Handle", slidingArea, theme.PrimaryColor, UiFactory.RoundedSprite());
+            UiFactory.SetRect(handle, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            radioPlaylistScrollbar = scrollbarRect.gameObject.AddComponent<Scrollbar>();
+            radioPlaylistScrollbar.handleRect = handle;
+            radioPlaylistScrollbar.targetGraphic = handle.GetComponent<Image>();
+            radioPlaylistScrollbar.direction = Scrollbar.Direction.BottomToTop;
+            radioPlaylistScrollbar.numberOfSteps = 0;
+
+            radioPlaylistScroll = radioPlaylist.gameObject.AddComponent<ScrollRect>();
+            radioPlaylistScroll.viewport = radioPlaylistViewport;
+            radioPlaylistScroll.content = radioPlaylistContent;
+            radioPlaylistScroll.horizontal = false;
+            radioPlaylistScroll.vertical = true;
+            radioPlaylistScroll.movementType = ScrollRect.MovementType.Clamped;
+            radioPlaylistScroll.inertia = true;
+            radioPlaylistScroll.decelerationRate = 0.12f;
+            radioPlaylistScroll.scrollSensitivity = 28f;
+            radioPlaylistScroll.verticalScrollbar = radioPlaylistScrollbar;
+            radioPlaylistScroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
+            radioPlaylistScroll.verticalScrollbarSpacing = 8f;
         }
 
         private void ToggleRadio()
         {
             radio = !radio;
             services.Audio.SetRadio(radio);
+            UpdateRadioPlayer();
+        }
+
+        private void ToggleOnlineRadio()
+        {
+            bool enable = !services.Audio.OnlineRadioIsActive;
+            services.Audio.SetOnlineRadio(enable);
+            radio = false;
+            playlistOpen = false;
+            if (radioPlaylist != null) radioPlaylist.gameObject.SetActive(false);
+            SetStatus(enable ? "Подключаем Детское онлайн-радио" : "Онлайн-радио выключено");
+            UpdateRadioPlayer();
+        }
+
+        private void ToggleRadioMusicVolume()
+        {
+            services.Audio.ToggleRadioMusicVolume();
+            SetStatus(services.Audio.RadioMusicVolumeMultiplier > 0.7f
+                ? "Громкость радио: 90%"
+                : "Громкость радио: 60%");
             UpdateRadioPlayer();
         }
 
@@ -765,30 +1204,107 @@ namespace SortingStation
         {
             playlistOpen = !playlistOpen;
             if (radioPlaylist != null) radioPlaylist.gameObject.SetActive(playlistOpen);
-            if (radioPlaylistButton != null) radioPlaylistButton.SetLabel(playlistOpen ? "≡ скрыть" : "≡ треки");
+            if (radioPlaylistButton != null)
+            {
+                radioPlaylistButton.SetSelected(playlistOpen);
+                radioPlaylistButton.SetAccessibleName(playlistOpen ? "Скрыть список треков" : "Открыть список треков");
+            }
         }
 
         private void UpdateRadioPlayer()
         {
             if (radioTrackTitle == null) return;
-            bool playing = services.Audio.RadioIsPlaying;
-            radioTrackTitle.text = playing ? services.Audio.RadioTrackName : "Радио выключено";
+            bool localPlaying = services.Audio.RadioIsPlaying;
+            bool onlinePlaying = services.Audio.OnlineRadioIsPlaying;
+            bool onlineConnecting = services.Audio.OnlineRadioIsConnecting;
+            bool onlineActive = services.Audio.OnlineRadioIsActive;
+            bool playing = localPlaying || onlinePlaying;
+            radioTrackTitle.text = onlineActive ? services.Audio.OnlineRadioName :
+                localPlaying ? services.Audio.RadioTrackName :
+                services.Audio.RadioTrackCount > 0 ? "Выберите трек" : "Нет треков";
             float time = services.Audio.RadioTrackTime;
             float duration = services.Audio.RadioTrackLength;
-            radioTime.text = string.Format("{0:00}:{1:00} - {2:00}:{3:00}", Mathf.FloorToInt(time / 60f), Mathf.FloorToInt(time % 60f), Mathf.FloorToInt(duration / 60f), Mathf.FloorToInt(duration % 60f));
-            if (radioPlayGlyph != null) radioPlayGlyph.gameObject.SetActive(!playing);
-            if (radioPauseGlyph != null) radioPauseGlyph.gameObject.SetActive(playing);
-            if (radioDisplay != null) radioDisplay.text = playing ? "Радио: " + services.Audio.RadioTrackName : "Радио выключено";
+            radioTime.text = onlineActive
+                ? services.Audio.OnlineRadioStatus
+                : string.Format("{0:00}:{1:00} — {2:00}:{3:00}", Mathf.FloorToInt(time / 60f), Mathf.FloorToInt(time % 60f), Mathf.FloorToInt(duration / 60f), Mathf.FloorToInt(duration % 60f));
+            if (radioPlayGlyph != null) radioPlayGlyph.gameObject.SetActive(!localPlaying);
+            if (radioPauseGlyph != null) radioPauseGlyph.gameObject.SetActive(localPlaying);
+            if (radioState != null)
+            {
+                radioState.text = onlineConnecting ? "СЕТЬ…" : onlinePlaying ? "ОНЛАЙН" : onlineActive ? "ANDROID" : localPlaying ? "В ЭФИРЕ" : "ВЫКЛ.";
+                radioState.color = playing || onlineActive ? services.Settings.SelectedColor : services.Settings.MutedTextColor;
+            }
+            if (radioStateLamp != null)
+                radioStateLamp.color = playing || onlineActive ? services.Settings.SelectedColor : new Color(0.42f, 0.51f, 0.55f, 1f);
+            if (radioProgressFill != null)
+            {
+                float progress = onlinePlaying ? 1f : duration > 0.01f ? Mathf.Clamp01(time / duration) : 0f;
+                Vector2 max = radioProgressFill.rectTransform.anchorMax;
+                max.x = progress;
+                radioProgressFill.rectTransform.anchorMax = max;
+            }
+            if (radioPowerButton != null)
+            {
+                radioPowerButton.SetSelected(localPlaying);
+                radioPowerButton.SetAccessibleName(localPlaying ? "Поставить локальное радио на паузу" : "Включить локальное радио");
+            }
+            if (onlineRadioButton != null)
+            {
+                onlineRadioButton.SetSelected(onlineActive);
+                onlineRadioButton.SetInteractable(services.Audio.OnlineRadioAvailable);
+                onlineRadioButton.SetAccessibleName(onlineActive
+                    ? "Выключить Детское онлайн-радио"
+                    : "Включить Детское онлайн-радио");
+            }
+            if (radioVolumeButton != null)
+            {
+                bool loud = services.Audio.RadioMusicVolumeMultiplier > 0.7f;
+                radioVolumeButton.SetSelected(loud);
+                radioVolumeButton.SetLabel(loud ? "90%" : "60%");
+                radioVolumeButton.SetAccessibleName(loud
+                    ? "Громкость песен и радио 90 процентов. Нажмите для 60 процентов"
+                    : "Громкость песен и радио 60 процентов. Нажмите для 90 процентов");
+            }
+            if (radioPlaylistButton != null) radioPlaylistButton.SetSelected(playlistOpen);
+            Color activeGlyph = services.Settings.TextOnBrightColor;
+            Color idleGlyph = services.Settings.TextColor;
+            SetRadioGlyphColor(radioPlayGlyph, localPlaying ? activeGlyph : idleGlyph);
+            SetRadioGlyphColor(radioPauseGlyph, localPlaying ? activeGlyph : idleGlyph);
+            SetRadioGlyphColor(radioPlaylistGlyph, playlistOpen ? activeGlyph : idleGlyph);
+            SetRadioGlyphColor(onlineRadioGlyph, onlineActive ? activeGlyph : idleGlyph);
+            for (int i = 0; i < radioTrackButtons.Count; i++)
+            {
+                bool selectedTrack = localPlaying && i == services.Audio.RadioTrackIndex;
+                radioTrackButtons[i].SetSelected(selectedTrack);
+                if (i < radioTrackLabels.Count)
+                    radioTrackLabels[i].color = selectedTrack ? services.Settings.TextOnBrightColor : services.Settings.TextColor;
+            }
+            UpdateRadioEqualizer(playing);
+            if (radioDisplay != null)
+                radioDisplay.text = onlineActive
+                    ? "Онлайн: " + services.Audio.OnlineRadioName
+                    : localPlaying ? "Радио: " + services.Audio.RadioTrackName : "Радио выключено";
         }
 
-        private void CreateThrottleStepButton(string name, string label, Vector2 min, Vector2 max, float direction)
+        private static void SetRadioGlyphColor(RectTransform root, Color color)
         {
-            AppSettings theme = services.Settings;
-            AccessibleButton button = UiFactory.Button(name, cabInterior, null, label,
-                WithAlpha(theme.PanelAltColor, 0.90f), theme.PrimaryColor,
-                () => AdjustThrottle(direction * services.CabRide.KeyboardThrottleStep), 42);
-            UiFactory.SetRect(button.RectTransform, min, max, Vector2.zero, Vector2.zero);
-            button.SetAccessibleName(direction < 0f ? "Уменьшить тягу" : "Увеличить тягу");
+            if (root == null) return;
+            Image icon = root.GetComponentInChildren<Image>();
+            if (icon != null) icon.color = color;
+        }
+
+        private void UpdateRadioEqualizer(bool playing)
+        {
+            MotionLevel motionLevel = services.Preferences.motionLevel;
+            float motionAmount = motionLevel == MotionLevel.Off ? 0f : motionLevel == MotionLevel.Reduced ? 0.35f : 1f;
+            for (int i = 0; i < radioEqualizerBars.Count; i++)
+            {
+                RectTransform bar = radioEqualizerBars[i];
+                float wave = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * (4.1f + i * 0.31f) + i * 1.37f);
+                float height = playing ? Mathf.Lerp(12f, 38f, Mathf.Lerp(0.45f, wave, motionAmount)) : 7f;
+                bar.sizeDelta = new Vector2(bar.sizeDelta.x, height);
+                bar.GetComponent<Image>().color = playing ? services.Settings.SelectedColor : new Color(0.34f, 0.45f, 0.49f, 0.82f);
+            }
         }
 
         private void BuildHeader()
@@ -868,7 +1384,37 @@ namespace SortingStation
                     UpdateToggleVisual(action, radio);
                     SetStatus(radio ? "Радио включено" : "Радио выключено");
                     break;
+                case CabControlAction.Doors:
+                    stationStop?.PressDoors();
+                    services.Audio.Play(SoundCue.Toggle);
+                    UpdateToggleVisual(action, stationStop != null && stationStop.DoorsAreOpen);
+                    SetStatus(stationStop != null && stationStop.DoorsAreOpen ? "Двери открыты" : "Двери доступны на станции");
+                    break;
+                case CabControlAction.WindowHeater:
+                    windowHeater = !windowHeater;
+                    journey?.SetWindowHeater(windowHeater);
+                    services.Audio.Play(SoundCue.Toggle);
+                    UpdateToggleVisual(action, windowHeater);
+                    SetStatus(windowHeater ? "Обогрев стекла включён" : "Обогрев стекла выключен");
+                    break;
+                case CabControlAction.DispatcherRadio:
+                    services.Audio.Play(SoundCue.Toggle);
+                    bool exchangeStarted = services.Audio.PlayDispatcherRadioExchange();
+                    SetStatus(exchangeStarted ? "Связь с диспетчером" : "Связь: добавьте пару аудио в Audio Catalog");
+                    break;
             }
+            ControlActivated?.Invoke(action);
+            bool handledInteraction = interactions != null && interactions.NotifyControlActivated(action);
+            if (!handledInteraction) NotifyJourneyControl(action);
+        }
+
+        private void NotifyJourneyControl(CabControlAction action)
+        {
+            if (journey == null) return;
+            if (action == CabControlAction.Horn) journey.NotifyAction(RouteEventAction.Horn);
+            else if (action == CabControlAction.Bell) journey.NotifyAction(RouteEventAction.Bell);
+            else if (action == CabControlAction.Headlights && headlights) journey.NotifyAction(RouteEventAction.Headlights);
+            else if (action == CabControlAction.Wipers && wipers) journey.NotifyAction(RouteEventAction.Wipers);
         }
 
         private void AdjustThrottle(float delta)
@@ -904,9 +1450,15 @@ namespace SortingStation
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(throttleButton.RectTransform,
                     eventData.position, camera, out Vector2 local)) return;
             Rect rect = throttleButton.RectTransform.rect;
-            float value = Mathf.InverseLerp(rect.yMin + 18f, rect.yMax - 18f, local.y);
+            float value = ThrottleFromLocalX(rect, local.x, 74f);
             motion.SetThrottle(value);
             UpdateThrottleVisual();
+        }
+
+        public static float ThrottleFromLocalX(Rect rect, float localX, float edgePadding)
+        {
+            float padding = Mathf.Clamp(edgePadding, 0f, rect.width * 0.45f);
+            return Mathf.Clamp01(Mathf.InverseLerp(rect.xMin + padding, rect.xMax - padding, localX));
         }
 
         private void BeginBrake(PointerEventData eventData)
@@ -938,16 +1490,24 @@ namespace SortingStation
         {
             if (!controls.TryGetValue(CabControlAction.Throttle, out AccessibleButton button)) return;
             int percent = Mathf.RoundToInt(motion.Throttle01 * 100f);
-            button.SetLabel("Тяга\n" + percent + "%");
+            button.SetLabel("ТЯГА " + percent + "%");
             button.SetAccessibleName("Тяга " + percent + " процентов");
             button.SetSelected(motion.Throttle01 > 0.001f);
             UpdateArtworkState(CabControlAction.Throttle, motion.Throttle01 > 0.001f, motion.Throttle01);
             if (throttleGrip != null)
             {
                 Vector2 anchor = throttleGrip.rectTransform.anchorMin;
-                anchor.y = Mathf.Lerp(0.16f, 0.84f, motion.Throttle01);
+                anchor.x = Mathf.Lerp(0.11f, 0.89f, motion.Throttle01);
                 throttleGrip.rectTransform.anchorMin = throttleGrip.rectTransform.anchorMax = anchor;
+                UpdateThrottleGripPressVisual();
             }
+        }
+
+        private void UpdateThrottleGripPressVisual()
+        {
+            if (throttleGrip == null) return;
+            float scale = throttleGripPressed ? 0.94f : 1f;
+            throttleGrip.rectTransform.localScale = new Vector3(scale, scale, 1f);
         }
 
         private void UpdateBrakeVisual(float brake01)
@@ -1016,10 +1576,14 @@ namespace SortingStation
                 CabControlAction.CabinLight => "Свет кабины",
                 CabControlAction.Wipers => "Дворники",
                 CabControlAction.Radio => "Радио",
+                CabControlAction.Doors => "Двери",
+                CabControlAction.WindowHeater => "Обогрев стекла",
+                CabControlAction.DispatcherRadio => "Связь",
                 _ => action.ToString()
             };
             string state = enabled ? "включены" : "выключены";
-            if (action == CabControlAction.Radio || action == CabControlAction.CabinLight)
+            if (action == CabControlAction.Radio || action == CabControlAction.CabinLight ||
+                action == CabControlAction.WindowHeater)
             {
                 state = enabled ? "включено" : "выключено";
             }
@@ -1055,8 +1619,8 @@ namespace SortingStation
                 services.CabRide.InstrumentIdleAlpha + cabinAlpha * services.CabRide.InstrumentCabinBoost);
             if (radioNightGlow != null)
             {
-                float nightGlow = 0.07f + cabinAlpha * 0.44f + world.TunnelBlend * 0.15f;
-                radioNightGlow.color = new Color(0.35f, 1f, 0.22f, nightGlow);
+                float nightGlow = 0.07f + cabinAlpha * 0.44f + world.TunnelBlend * 0.15f + (journey != null ? journey.Night01 * 0.20f : 0f);
+                radioNightGlow.color = new Color(0.40f, 0.84f, 0.96f, nightGlow);
             }
         }
 
@@ -1094,7 +1658,8 @@ namespace SortingStation
                 return;
             }
 
-            float motionMultiplier = services.Preferences.motionLevel == MotionLevel.Reduced ? 0.32f : 1f;
+            float motionMultiplier = CabSwayMotionMultiplier(services.Preferences.motionLevel,
+                Application.platform == RuntimePlatform.Android, services.CabRide.AndroidCabinSwayMultiplier);
             float speedBlend = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.025f, 0.72f, motion.Speed01));
             float phase = Time.unscaledTime * Mathf.Lerp(2.7f, 5.15f, motion.Speed01);
             float secondaryPhase = Time.unscaledTime * Mathf.Lerp(1.35f, 2.25f, motion.Speed01) + 1.1f;
@@ -1113,6 +1678,14 @@ namespace SortingStation
                 smooth, 12f, Mathf.Clamp(deltaTime, 0f, 0.1f));
             cabInterior.anchoredPosition = cabinSwayOffset;
             cabInterior.localRotation = Quaternion.Euler(0f, 0f, cabinSwayAngle);
+        }
+
+        public static float CabSwayMotionMultiplier(MotionLevel motionLevel, bool isAndroid, float androidMultiplier)
+        {
+            if (motionLevel == MotionLevel.Off) return 0f;
+            float accessibilityMultiplier = motionLevel == MotionLevel.Reduced ? 0.32f : 1f;
+            float platformMultiplier = isAndroid ? Mathf.Clamp(androidMultiplier, 1f, 3f) : 1f;
+            return accessibilityMultiplier * platformMultiplier;
         }
 
         private void AnimateKeychain(float deltaTime)
@@ -1168,6 +1741,9 @@ namespace SortingStation
                 CabControlAction.Radio => prefix + "Радио\n○ выкл.",
                 CabControlAction.Throttle => "Тяга\n0%",
                 CabControlAction.Brake => "Тормоз\nдержать",
+                CabControlAction.Doors => prefix + "Двери\n○ закрыты",
+                CabControlAction.WindowHeater => prefix + "Обогрев\n○ выкл.",
+                CabControlAction.DispatcherRadio => prefix + "Связь",
                 _ => binding.label
             };
         }
@@ -1214,6 +1790,20 @@ namespace SortingStation
         private void SetStatus(string value)
         {
             if (status != null) status.text = value;
+        }
+
+        private void OnJourneyStatus(string value)
+        {
+            if (!vigilanceAlarm) SetStatus(value);
+        }
+
+        private void OnJourneyWeather(WeatherType weatherType, float intensity)
+        {
+            services.Audio.SetWeather(weatherType, intensity);
+            bool badWeather = weatherType == WeatherType.Rain || weatherType == WeatherType.Fog || weatherType == WeatherType.Snow;
+            if (badWeather && weatherType != lastDispatcherWeather)
+                services.Audio.PlayDispatcher(DispatcherVoiceCue.BadWeather);
+            lastDispatcherWeather = weatherType;
         }
 
         private void ReturnToMenu()

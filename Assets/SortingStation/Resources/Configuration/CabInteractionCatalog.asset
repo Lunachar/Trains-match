@@ -1,0 +1,215 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8192c92caeaa2574e95815d2961a9406, type: 3}
+  m_Name: CabInteractionCatalog
+  m_EditorClassIdentifier: 
+  minimumIntervalSeconds: 45
+  maximumIntervalSeconds: 90
+  recentHistorySize: 3
+  interactions:
+  - id: cow_horn
+    displayName: "\u041A\u043E\u0440\u043E\u0432\u0430"
+    enabled: 1
+    weight: 1
+    requiredControl: 0
+    reaction: 0
+    sceneryIdContains: cow
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: HORN
+    requiresDispatcherPair: 0
+  - id: sheep_bell
+    displayName: "\u041E\u0432\u0446\u044B"
+    enabled: 1
+    weight: 1
+    requiredControl: 4
+    reaction: 1
+    sceneryIdContains: sheep
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: BELL
+    requiresDispatcherPair: 0
+  - id: horses_horn
+    displayName: "\u041B\u043E\u0448\u0430\u0434\u0438"
+    enabled: 1
+    weight: 1
+    requiredControl: 0
+    reaction: 0
+    sceneryIdContains: horse
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: HORN
+    requiresDispatcherPair: 0
+  - id: birds_bell
+    displayName: "\u041F\u0442\u0438\u0446\u044B"
+    enabled: 1
+    weight: 1
+    requiredControl: 4
+    reaction: 2
+    sceneryIdContains: bird
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: BELL
+    requiresDispatcherPair: 0
+  - id: workers_horn
+    displayName: "\u041F\u0443\u0442\u0435\u0432\u044B\u0435 \u0440\u0430\u0431\u043E\u0447\u0438\u0435"
+    enabled: 1
+    weight: 1
+    requiredControl: 0
+    reaction: 3
+    sceneryIdContains: worker
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: HORN
+    requiresDispatcherPair: 0
+  - id: crossing_horn
+    displayName: "\u041F\u0435\u0440\u0435\u0435\u0437\u0434"
+    enabled: 1
+    weight: 1
+    requiredControl: 0
+    reaction: 4
+    sceneryIdContains: crossing
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: HORN
+    requiresDispatcherPair: 0
+  - id: meeting_train_horn
+    displayName: "\u0412\u0441\u0442\u0440\u0435\u0447\u043D\u044B\u0439 \u043F\u043E\u0435\u0437\u0434"
+    enabled: 1
+    weight: 1
+    requiredControl: 0
+    reaction: 5
+    sceneryIdContains: train
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: HORN
+    requiresDispatcherPair: 0
+  - id: tunnel_horn
+    displayName: "\u042D\u0445\u043E \u0432 \u0442\u043E\u043D\u043D\u0435\u043B\u0435"
+    enabled: 1
+    weight: 1
+    requiredControl: 0
+    reaction: 6
+    sceneryIdContains: 
+    segments: 06000000
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: HORN
+    requiresDispatcherPair: 0
+  - id: dark_headlights
+    displayName: "\u0422\u0451\u043C\u043D\u044B\u0439 \u0443\u0447\u0430\u0441\u0442\u043E\u043A"
+    enabled: 1
+    weight: 1
+    requiredControl: 1
+    reaction: 7
+    sceneryIdContains: 
+    segments: 06000000
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: LIGHT
+    requiresDispatcherPair: 0
+  - id: window_heater
+    displayName: "\u0417\u0430\u043F\u043E\u0442\u0435\u0432\u0448\u0435\u0435 \u0441\u0442\u0435\u043A\u043B\u043E"
+    enabled: 1
+    weight: 1
+    requiredControl: 9
+    reaction: 8
+    sceneryIdContains: 
+    segments: 
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: HOT
+    requiresDispatcherPair: 0
+  - id: station_doors
+    displayName: "\u0421\u0442\u0430\u043D\u0446\u0438\u044F"
+    enabled: 1
+    weight: 1
+    requiredControl: 8
+    reaction: 9
+    sceneryIdContains: station
+    segments: 02000000
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: <>
+    requiresDispatcherPair: 0
+  - id: dispatcher_context
+    displayName: "\u0421\u0432\u044F\u0437\u044C \u0441 \u0434\u0438\u0441\u043F\u0435\u0442\u0447\u0435\u0440\u043E\u043C"
+    enabled: 1
+    weight: 1
+    requiredControl: 10
+    reaction: 10
+    sceneryIdContains: 
+    segments: 0300000002000000
+    weather: 
+    minimumSpeed01: 0.08
+    maximumSpeed01: 1
+    opportunitySeconds: 8
+    hintSeconds: 5
+    hintIcon: {fileID: 0}
+    fallbackIcon: "\u25CF"
+    requiresDispatcherPair: 0
+  minimumStationIntervalSeconds: 360
+  maximumStationIntervalSeconds: 600
+  stationDoorWaitSeconds: 8
+  stationOpenSeconds: 7
+  stationTractionReleaseSeconds: 1.5

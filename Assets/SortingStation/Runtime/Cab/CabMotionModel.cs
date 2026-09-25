@@ -30,10 +30,16 @@ namespace SortingStation
 
         public void Step(float unscaledDeltaTime, float brake01)
         {
+            Step(unscaledDeltaTime, brake01, 1f);
+        }
+
+        public void Step(float unscaledDeltaTime, float brake01, float externalTractionMultiplier)
+        {
             float dt = Mathf.Clamp(unscaledDeltaTime, 0f, 0.1f);
             if (dt <= 0f) return;
 
-            float tractionTarget = Mathf.Clamp01(definition.TractionCurve.Evaluate(Throttle01));
+            float tractionTarget = Mathf.Clamp01(definition.TractionCurve.Evaluate(Throttle01)) *
+                                   Mathf.Clamp01(externalTractionMultiplier);
             float brake = Mathf.Clamp01(definition.BrakingCurve.Evaluate(Mathf.Clamp01(brake01)));
             float target = Mathf.Lerp(tractionTarget, 0f, brake);
             float responseSeconds;

@@ -12,11 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef0287315528c8d44bc3b167cb56d0b2, type: 3}
   m_Name: AudioCatalog
   m_EditorClassIdentifier: 
-  menuMusic: {fileID: 8300000, guid: 80451219674d200489a4a2a9d3dedb92, type: 3}
+  menuMusic: {fileID: 8300000, guid: 32586e08d4b7c5f49bd85fe611363d20, type: 3}
   cabRadioMusic: {fileID: 8300000, guid: 80451219674d200489a4a2a9d3dedb92, type: 3}
   cabRadioPlaylist:
-  - {fileID: 8300000, guid: 80451219674d200489a4a2a9d3dedb92, type: 3}
-  railLoop: {fileID: 8300000, guid: ec7d01d74e2f4b64c8953599291cfda5, type: 3}
+  - {fileID: 8300000, guid: 9cfb3a917a44f684188a073d37b52ba6, type: 3}
+  - {fileID: 8300000, guid: 0a508d554b34023458739781fc11a655, type: 3}
+  - {fileID: 8300000, guid: 3e76b451c53b2ac45ad5661b1f2e6af5, type: 3}
+  - {fileID: 8300000, guid: 47ca8e68c25375f40b1e5b074280fb67, type: 3}
+  - {fileID: 8300000, guid: d8179e4a7055e9142846c21366868bc0, type: 3}
+  - {fileID: 8300000, guid: 719231e28d580e743a0eb78adb5df413, type: 3}
+  - {fileID: 8300000, guid: d2719ad27d5d74d4986a6dd16a6f7b3c, type: 3}
+  - {fileID: 8300000, guid: 6cf59029aa7e46d4dbfadc842fade2cc, type: 3}
+  - {fileID: 8300000, guid: 5843a0644483ff1438379235152471ff, type: 3}
+  - {fileID: 8300000, guid: a4b83e957e18ed44dad06ee4095370b9, type: 3}
+  - {fileID: 8300000, guid: 37ffdeb90a9d78c469760b15b05a35e8, type: 3}
+  railLoop: {fileID: 8300000, guid: 1f369c37ffd78b94ca5803685bb3b3da, type: 3}
+  rainLoop: {fileID: 8300000, guid: 993759881aec30147ac128530c66260d, type: 3}
+  snowLoop: {fileID: 8300000, guid: 7af71e81497d9cd4ea15bb2f2be317e7, type: 3}
   events:
   - cue: 0
     volume: 0.34
@@ -110,3 +122,619 @@ MonoBehaviour:
     cooldownSeconds: 0.05
     fallback: {fileID: 0}
     variants: []
+  - cue: 13
+    volume: 0.32
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 14
+    volume: 0.48
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  - cue: 17
+    volume: 0.3
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 0.05
+    fallback: {fileID: 0}
+    variants: []
+  ambientEvents:
+  - cue: 0
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 12
+    variants: []
+  - cue: 1
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants:
+    - {fileID: 8300000, guid: c20f5517b775169448521338e56375b4, type: 3}
+  - cue: 2
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 3
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 4
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 5
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 6
+    playbackMode: 1
+    minimumPlaySeconds: 8
+    maximumPlaySeconds: 18
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants:
+    - {fileID: 8300000, guid: a0709db7cfcb3034cbfafde17993e48a, type: 3}
+  - cue: 7
+    playbackMode: 1
+    minimumPlaySeconds: 8
+    maximumPlaySeconds: 20
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants:
+    - {fileID: 8300000, guid: dc74f2d357e08c14a8b9a3833a235991, type: 3}
+  - cue: 8
+    playbackMode: 1
+    minimumPlaySeconds: 8
+    maximumPlaySeconds: 20
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 9
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 10
+    playbackMode: 1
+    minimumPlaySeconds: 4
+    maximumPlaySeconds: 9
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 11
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants:
+    - {fileID: 8300000, guid: ba243f4ef8ce90645a34918443f6feea, type: 3}
+  - cue: 12
+    playbackMode: 1
+    minimumPlaySeconds: 8
+    maximumPlaySeconds: 18
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 18
+    variants: []
+  - cue: 13
+    playbackMode: 1
+    minimumPlaySeconds: 12
+    maximumPlaySeconds: 24
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 25
+    variants:
+    - {fileID: 8300000, guid: a0709db7cfcb3034cbfafde17993e48a, type: 3}
+  - cue: 14
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 15
+    playbackMode: 1
+    minimumPlaySeconds: 10
+    maximumPlaySeconds: 22
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 18
+    variants: []
+  - cue: 16
+    playbackMode: 1
+    minimumPlaySeconds: 8
+    maximumPlaySeconds: 18
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 17
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 18
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 19
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 20
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 21
+    playbackMode: 1
+    minimumPlaySeconds: 6
+    maximumPlaySeconds: 18
+    durationMultiplier: 1
+    randomStartOffset: 1
+    fadeSeconds: 0.45
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 22
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 23
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.55
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 8
+    variants: []
+  - cue: 24
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.42
+    pitchMin: 0.96
+    pitchMax: 1.04
+    cooldownSeconds: 18
+    variants: []
+  - cue: 25
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.38
+    pitchMin: 0.98
+    pitchMax: 1.02
+    cooldownSeconds: 16
+    variants: []
+  - cue: 26
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.46
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 12
+    variants: []
+  - cue: 27
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.34
+    pitchMin: 0.97
+    pitchMax: 1.03
+    cooldownSeconds: 10
+    variants: []
+  dispatcherAnnouncements:
+  - cue: 0
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.9
+    cooldownSeconds: 5
+    variants:
+    - {fileID: 8300000, guid: 9026014e07831b24fa6450ca4854b4ad, type: 3}
+  - cue: 1
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.9
+    cooldownSeconds: 5
+    variants:
+    - {fileID: 8300000, guid: f261f873eec9b034788007f1d8076192, type: 3}
+  - cue: 2
+    playbackMode: 0
+    minimumPlaySeconds: 0
+    maximumPlaySeconds: 0
+    durationMultiplier: 1
+    randomStartOffset: 0
+    fadeSeconds: 0
+    volume: 0.9
+    cooldownSeconds: 5
+    variants:
+    - {fileID: 8300000, guid: c2551b0303f638246b0965a54d2bfecd, type: 3}
+  - cue: 3
+    volume: 0.9
+    cooldownSeconds: 30
+    variants:
+    - {fileID: 8300000, guid: 201b9b3abd9651440bf0d5f621e28c7b, type: 3}
+  cabInteractionAudio:
+  - interactionId: cow_horn
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: sheep_bell
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: horses_horn
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: birds_bell
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: workers_horn
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: crossing_horn
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: meeting_train_horn
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: tunnel_horn
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: dark_headlights
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: window_heater
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: station_doors
+    volume: 0.8
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  - interactionId: dispatcher_context
+    volume: 0.9
+    cooldownSeconds: 8
+    reactionVariants: []
+    dispatcherCalls: []
+    dispatcherResponses: []
+  dispatcherRadioPairs:
+  - id: calm
+    driverLine: "Состав - диспетчеру: обстановка спокойная."
+    dispatcherLine: "Диспетчер: принято, хорошего пути."
+    driverClip: {fileID: 8300000, guid: b58438c85061a744b9d61dd75f194e19, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: 67c6537b80d2d894389ef9eaad542e9b, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: schedule
+    driverLine: "Состав - диспетчеру: продолжаем движение по графику."
+    dispatcherLine: "Диспетчер: принято, путь свободен."
+    driverClip: {fileID: 8300000, guid: bf4c86db4e69bc1458511ba745168441, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: d5b6d0cc52973834e9051945781442ca, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: check
+    driverLine: "Состав - диспетчеру: связь проверяю."
+    dispatcherLine: "Диспетчер: слышу хорошо."
+    driverClip: {fileID: 8300000, guid: 362bb4fb68960cf4d99b678c3e66a0ad, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: a7193ee6af752964f8a54d909878247b, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: section_done
+    driverLine: "Состав - диспетчеру: участок пройден."
+    dispatcherLine: "Диспетчер: принято."
+    driverClip: {fileID: 8300000, guid: 7cb6e5e3507ba4047af5ad165a656b1e, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: 09519990d31850149bccf10dce71c5e4, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: visibility
+    driverLine: "Состав - диспетчеру: видимость хорошая."
+    dispatcherLine: "Диспетчер: принято, следуйте дальше."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: forest
+    driverLine: "Состав - диспетчеру: впереди лесной участок."
+    dispatcherLine: "Диспетчер: принято, будьте внимательны."
+    driverClip: {fileID: 8300000, guid: efd43af070216064da3735f162ec9fe2, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: f94d8e7a5e9ec654fa43446a055b94a6, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: bridge
+    driverLine: "Состав - диспетчеру: проходим мост."
+    dispatcherLine: "Диспетчер: принято."
+    driverClip: {fileID: 8300000, guid: 0155aebb232c60b4c8236092d33b7140, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: 1cc5a1a18348b87489fa34ad66d77f7d, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: station_near
+    driverLine: "Состав - диспетчеру: приближаемся к станции."
+    dispatcherLine: "Диспетчер: принято, встречаем."
+    driverClip: {fileID: 8300000, guid: 1d66f8ca34a300f4ca16e19275b476b2, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: 7562eb3c8cc72004c926fb74c4216468, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: station_passed
+    driverLine: "Состав - диспетчеру: станцию проследовали."
+    dispatcherLine: "Диспетчер: счастливого пути."
+    driverClip: {fileID: 8300000, guid: a29deece72a57dc47ad6658ed4d410a4, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: 2f084b4252b30aa45834377f42c20ec9, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: tunnel_in
+    driverLine: "Состав - диспетчеру: входим в тоннель."
+    dispatcherLine: "Диспетчер: принято, включите фары."
+    driverClip: {fileID: 8300000, guid: 9ae4835a1d0280840a3edef1a1ea9096, type: 3}
+    dispatcherClip: {fileID: 8300000, guid: 1786262984899cc4b9594a469f72a44a, type: 3}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: tunnel_out
+    driverLine: "Состав - диспетчеру: тоннель пройден."
+    dispatcherLine: "Диспетчер: принято."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: rain
+    driverLine: "Состав - диспетчеру: наблюдаем дождь."
+    dispatcherLine: "Диспетчер: принято, осторожнее."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: weather_good
+    driverLine: "Состав - диспетчеру: погода улучшается."
+    dispatcherLine: "Диспетчер: принято."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: line_quiet
+    driverLine: "Состав - диспетчеру: на линии всё спокойно."
+    dispatcherLine: "Диспетчер: рад слышать, продолжайте."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: birds
+    driverLine: "Состав - диспетчеру: слышим птиц у пути."
+    dispatcherLine: "Диспетчер: значит, день будет добрым."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: village
+    driverLine: "Состав - диспетчеру: проезжаем деревню."
+    dispatcherLine: "Диспетчер: передавайте привет."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: city
+    driverLine: "Состав - диспетчеру: впереди город."
+    dispatcherLine: "Диспетчер: принято, путь свободен."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: passengers
+    driverLine: "Состав - диспетчеру: пассажиры в порядке."
+    dispatcherLine: "Диспетчер: отлично, продолжайте движение."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: equipment
+    driverLine: "Состав - диспетчеру: проверка оборудования завершена."
+    dispatcherLine: "Диспетчер: принято, всё исправно."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25
+  - id: signoff
+    driverLine: "Состав - диспетчеру: заканчиваем сеанс связи."
+    dispatcherLine: "Диспетчер: принято, до следующего вызова."
+    driverClip: {fileID: 0}
+    dispatcherClip: {fileID: 0}
+    volume: 0.9
+    responseDelaySeconds: 0.25

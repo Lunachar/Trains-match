@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff11a5a7f9bf2b9449c48adf8f06281c, type: 3}
   m_Name: CabRideDefinition
   m_EditorClassIdentifier: 
-  configurationVersion: 9
+  configurationVersion: 14
   maximumSpeedKph: 90
   accelerationSeconds: 7
   serviceBrakeSeconds: 4.5
@@ -77,6 +77,9 @@ MonoBehaviour:
   cabinSwayPixels: 7
   cabinSwayRotationDegrees: 0.48
   cabinSwaySmoothSeconds: 0.26
+  androidCabinSwayMultiplier: 1.65
+  wiperClearAreaMultiplier: 5
+  wiperCenterOverlapDegrees: 55
   headlightLandscapeAlpha: 0.2
   headlightTunnelAlpha: 0.58
   cabinLightAlpha: 0.24
@@ -86,82 +89,112 @@ MonoBehaviour:
   controls:
   - action: 0
     label: "\u0413\u0443\u0434\u043E\u043A"
-    icon: "\u25CF"
+    icon: HORN
     artwork: {fileID: -6543312089722105640, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.5, y: 0.64}
     artworkSize: {x: 0.64, y: 0.52}
     shortcut: 22
-    normalizedCenter: {x: 0.43, y: 0.425}
-    normalizedSize: {x: 0.1, y: 0.13}
+    normalizedCenter: {x: 0.425, y: 0.435}
+    normalizedSize: {x: 0.08000001, y: 0.120000005}
     momentary: 1
   - action: 1
     label: "\u0424\u0430\u0440\u044B"
-    icon: "\u263C"
+    icon: LIGHT
     artwork: {fileID: -4427255103066908989, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.5, y: 0.64}
     artworkSize: {x: 0.64, y: 0.52}
     shortcut: 20
-    normalizedCenter: {x: 0.875, y: 0.405}
-    normalizedSize: {x: 0.09, y: 0.13}
+    normalizedCenter: {x: 0.935, y: 0.74386}
+    normalizedSize: {x: 0.08500004, y: 0.13}
     momentary: 0
   - action: 2
     label: "\u0421\u0432\u0435\u0442 \u043A\u0430\u0431\u0438\u043D\u044B"
-    icon: "\u25CF"
+    icon: CAB
     artwork: {fileID: 5383701108216127170, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.5, y: 0.64}
     artworkSize: {x: 0.64, y: 0.52}
     shortcut: 17
-    normalizedCenter: {x: 0.69, y: 0.48}
-    normalizedSize: {x: 0.09, y: 0.13}
+    normalizedCenter: {x: 0.532, y: 0.405}
+    normalizedSize: {x: 0.08500004, y: 0.125}
     momentary: 0
   - action: 3
     label: "\u0414\u0432\u043E\u0440\u043D\u0438\u043A\u0438"
-    icon: "\u2248"
+    icon: WIP
     artwork: {fileID: 5082985279519879829, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.5, y: 0.64}
     artworkSize: {x: 0.64, y: 0.52}
     shortcut: 37
-    normalizedCenter: {x: 0.865, y: 0.535}
-    normalizedSize: {x: 0.09, y: 0.12}
+    normalizedCenter: {x: 0.7373333, y: 0.5254687}
+    normalizedSize: {x: 0.089999974, y: 0.120000005}
     momentary: 0
   - action: 4
     label: "\u0417\u0432\u043E\u043D\u043E\u043A"
-    icon: "\u266A"
+    icon: BELL
     artwork: {fileID: 1772487479614756497, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.5, y: 0.64}
     artworkSize: {x: 0.64, y: 0.52}
     shortcut: 16
-    normalizedCenter: {x: 0.295, y: 0.395}
-    normalizedSize: {x: 0.1, y: 0.13}
+    normalizedCenter: {x: 0.19266666, y: 0.80420005}
+    normalizedSize: {x: 0.09, y: 0.125}
     momentary: 1
   - action: 5
     label: "\u0422\u044F\u0433\u0430"
-    icon: "\u2195"
+    icon: +/-
     artwork: {fileID: -4629565384708770704, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.36, y: 0.62}
     artworkSize: {x: 0.56, y: 0.66}
     shortcut: 0
-    normalizedCenter: {x: 0.548, y: 0.285}
-    normalizedSize: {x: 0.115, y: 0.19}
+    normalizedCenter: {x: 0.63, y: 0.185}
+    normalizedSize: {x: 0.53, y: 0.13}
     momentary: 0
   - action: 6
     label: "\u0422\u043E\u0440\u043C\u043E\u0437"
-    icon: "\u25A0"
+    icon: STOP
     artwork: {fileID: 918661507637448446, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.36, y: 0.62}
     artworkSize: {x: 0.56, y: 0.66}
     shortcut: 0
-    normalizedCenter: {x: 0.674, y: 0.285}
-    normalizedSize: {x: 0.115, y: 0.19}
+    normalizedCenter: {x: 0.945, y: 0.35465598}
+    normalizedSize: {x: 0.08000004, y: 0.33931}
     momentary: 1
   - action: 7
     label: "\u0420\u0430\u0434\u0438\u043E"
-    icon: "\u266B"
+    icon: RAD
     artwork: {fileID: -8402356817074689750, guid: 7d8226a02aba2e6448d3a5344e7a69be, type: 3}
     artworkCenter: {x: 0.5, y: 0.64}
     artworkSize: {x: 0.76, y: 0.48}
     shortcut: 32
-    normalizedCenter: {x: 0.18, y: 0.315}
-    normalizedSize: {x: 0.09, y: 0.12}
+    normalizedCenter: {x: 0.16499999, y: 0.294688}
+    normalizedSize: {x: 0.315, y: 0.34000003}
     momentary: 0
+  - action: 8
+    label: "\u0414\u0432\u0435\u0440\u0438"
+    icon: <>
+    artwork: {fileID: 0}
+    artworkCenter: {x: 0.5, y: 0.64}
+    artworkSize: {x: 0.64, y: 0.52}
+    shortcut: 18
+    normalizedCenter: {x: 0.935, y: 0.639}
+    normalizedSize: {x: 0.08000004, y: 0.125}
+    momentary: 0
+  - action: 9
+    label: "\u041E\u0431\u043E\u0433\u0440\u0435\u0432 \u0441\u0442\u0435\u043A\u043B\u0430"
+    icon: HOT
+    artwork: {fileID: 0}
+    artworkCenter: {x: 0.5, y: 0.64}
+    artworkSize: {x: 0.64, y: 0.52}
+    shortcut: 21
+    normalizedCenter: {x: 0.862, y: 0.545}
+    normalizedSize: {x: 0.08499998, y: 0.120000005}
+    momentary: 0
+  - action: 10
+    label: "\u0421\u0432\u044F\u0437\u044C"
+    icon: CALL
+    artwork: {fileID: 0}
+    artworkCenter: {x: 0.5, y: 0.64}
+    artworkSize: {x: 0.64, y: 0.52}
+    shortcut: 34
+    normalizedCenter: {x: 0.52199996, y: 0.292}
+    normalizedSize: {x: 0.08499998, y: 0.125}
+    momentary: 1
   layers: []

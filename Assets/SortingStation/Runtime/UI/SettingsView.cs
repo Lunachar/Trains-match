@@ -55,7 +55,7 @@ namespace SortingStation
                     services.SavePreferences();
                     if (services.Preferences.speechEnabled) services.Speech.Speak("Голосовые подсказки включены");
                 }, 27);
-            UiFactory.SetRect(speech.RectTransform, new Vector2(0.06f, 0.10f), new Vector2(0.41f, 0.22f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(speech.RectTransform, new Vector2(0.04f, 0.15f), new Vector2(0.34f, 0.265f), Vector2.zero, Vector2.zero);
             speech.SetSelected(services.Preferences.speechEnabled);
 
             AccessibleButton motion = null;
@@ -67,12 +67,48 @@ namespace SortingStation
                     motion.SetSelected(services.Preferences.motionLevel != MotionLevel.Normal);
                     services.SavePreferences();
                 }, 27);
-            UiFactory.SetRect(motion.RectTransform, new Vector2(0.43f, 0.10f), new Vector2(0.72f, 0.22f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(motion.RectTransform, new Vector2(0.35f, 0.15f), new Vector2(0.65f, 0.265f), Vector2.zero, Vector2.zero);
             motion.SetSelected(services.Preferences.motionLevel != MotionLevel.Normal);
+
+            AccessibleButton prompts = null;
+            prompts = UiFactory.Button("RoutePrompts", card, focusGroup, RoutePromptsLabel(), theme.PanelAltColor,
+                theme.SelectedColor, () =>
+                {
+                    services.Preferences.routePromptsEnabled = !services.Preferences.routePromptsEnabled;
+                    prompts.SetLabel(RoutePromptsLabel());
+                    prompts.SetSelected(services.Preferences.routePromptsEnabled);
+                    services.SavePreferences();
+                }, 24);
+            UiFactory.SetRect(prompts.RectTransform, new Vector2(0.66f, 0.15f), new Vector2(0.96f, 0.265f), Vector2.zero, Vector2.zero);
+            prompts.SetSelected(services.Preferences.routePromptsEnabled);
+
+            AccessibleButton interactions = null;
+            interactions = UiFactory.Button("GentleInteractions", card, focusGroup, InteractionsLabel(), theme.PanelAltColor,
+                theme.SelectedColor, () =>
+                {
+                    services.Preferences.gentleInteractionsEnabled = !services.Preferences.gentleInteractionsEnabled;
+                    interactions.SetLabel(InteractionsLabel());
+                    interactions.SetSelected(services.Preferences.gentleInteractionsEnabled);
+                    services.SavePreferences();
+                }, 23);
+            UiFactory.SetRect(interactions.RectTransform, new Vector2(0.04f, 0.02f), new Vector2(0.34f, 0.135f), Vector2.zero, Vector2.zero);
+            interactions.SetSelected(services.Preferences.gentleInteractionsEnabled);
+
+            AccessibleButton hints = null;
+            hints = UiFactory.Button("GentleHints", card, focusGroup, HintsLabel(), theme.PanelAltColor,
+                theme.SelectedColor, () =>
+                {
+                    services.Preferences.gentleHintsEnabled = !services.Preferences.gentleHintsEnabled;
+                    hints.SetLabel(HintsLabel());
+                    hints.SetSelected(services.Preferences.gentleHintsEnabled);
+                    services.SavePreferences();
+                }, 23);
+            UiFactory.SetRect(hints.RectTransform, new Vector2(0.35f, 0.02f), new Vector2(0.65f, 0.135f), Vector2.zero, Vector2.zero);
+            hints.SetSelected(services.Preferences.gentleHintsEnabled);
 
             AccessibleButton close = UiFactory.Button("Close", card, focusGroup, "Готово", theme.PrimaryColor,
                 theme.SelectedColor, Close, 34);
-            UiFactory.SetRect(close.RectTransform, new Vector2(0.74f, 0.10f), new Vector2(0.94f, 0.22f), Vector2.zero, Vector2.zero);
+            UiFactory.SetRect(close.RectTransform, new Vector2(0.66f, 0.02f), new Vector2(0.96f, 0.135f), Vector2.zero, Vector2.zero);
         }
 
         private void CreateVolumeRow(RectTransform parent, string labelText, float anchorY, Func<float> getter, Action<float> setter)
@@ -106,6 +142,9 @@ namespace SortingStation
         }
 
         private string SpeechLabel() => services.Preferences.speechEnabled ? "Голос: включён" : "Голос: выключен";
+        private string RoutePromptsLabel() => services.Preferences.routePromptsEnabled ? "Подсказки в поездке: да" : "Подсказки в поездке: нет";
+        private string InteractionsLabel() => services.Preferences.gentleInteractionsEnabled ? "Реакции мира: да" : "Реакции мира: нет";
+        private string HintsLabel() => services.Preferences.gentleHintsEnabled ? "Значки-подсказки: да" : "Значки-подсказки: нет";
 
         private string MotionLabel()
         {

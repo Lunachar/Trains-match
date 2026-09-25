@@ -1,0 +1,209 @@
+[
+  {
+    "name": "real_animated_windmill_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f03.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f04.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f05.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f06.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_f07.png"
+    ],
+    "guids": [
+      "e0da7e6f5b4246db928f3360386ab8e8",
+      "9a9db13972024c30b92f078614a36815",
+      "ade6cf32fccb4a8ca6100ec568f0413b",
+      "5c8954ee1f544fde9e2675eea985ea76",
+      "a261998d3f8c4e6a888448cbee6364dc",
+      "6318103cd8d6423cb391442f6f8f221d",
+      "85ce95724298448399aa48633de3003f",
+      "09afb823589c4e5282d504496b45f80e"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_windmill_v1_strip.png",
+    "strip_guid": "1f0ebab0019a465db63f0ce499338f85",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_windmill_v1_preview.gif",
+    "gif_guid": "6792effd351648e3b1c42f1f843e1838"
+  },
+  {
+    "name": "real_animated_wind_turbine_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f03.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f04.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f05.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f06.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_f07.png"
+    ],
+    "guids": [
+      "2c0a68ab6e8847a5a768f00ba82d5339",
+      "25965c55f7d34e0c82761e6a1b7a89dd",
+      "d951b412a2a44429ac45e46f04010049",
+      "0fdae7196a7e4030a17a88b007827e32",
+      "8e22832617cf4b7c9054f39ef5fbc9d5",
+      "34d543724bc34b9587441c482ee62977",
+      "7709a438f4a04e95a771e430acea2b23",
+      "2fe5c0be412441c2a9d298f9de79192f"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_wind_turbine_v1_strip.png",
+    "strip_guid": "54a8c60fd64b4b3bb6da6c18de1418b4",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_wind_turbine_v1_preview.gif",
+    "gif_guid": "3f90c6fdf87e47479c0f00bbb53bba02"
+  },
+  {
+    "name": "real_animated_car_blue_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_car_blue_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_car_blue_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_car_blue_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_car_blue_v1_f03.png"
+    ],
+    "guids": [
+      "dfdc0d6a1d7d4061ba4aae3ebe5c7717",
+      "5b57ac470d4644ec9bfeae0ae19270be",
+      "bef8c13dcdb244a4b271b664a5e20bd7",
+      "6cca901d8f774665ab9164814e95909e"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_car_blue_v1_strip.png",
+    "strip_guid": "9b757db889de4caa8c0c62f4258edfa6",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_car_blue_v1_preview.gif",
+    "gif_guid": "abaaef8dab9348488c2cb0b49edd31e9"
+  },
+  {
+    "name": "real_animated_birds_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_birds_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_birds_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_birds_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_birds_v1_f03.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_birds_v1_f04.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_birds_v1_f05.png"
+    ],
+    "guids": [
+      "910c6b13d3484912a438a8bdd7047d61",
+      "29736a7c953845d7a0678c5e5987bc8c",
+      "af53733b481648d9a8f9034a82de389f",
+      "98d4df62d68740158f81a161d9ed4010",
+      "4e83c86587da4308bae5df86e5e55cef",
+      "5bceda275e324ba89ee852c29404c5f2"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_birds_v1_strip.png",
+    "strip_guid": "9d41d66d324d4efea30a17607ef00bc5",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_birds_v1_preview.gif",
+    "gif_guid": "bade3ea8730c4ff09edb4cf4f4b53b35"
+  },
+  {
+    "name": "real_animated_airplane_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_airplane_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_airplane_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_airplane_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_airplane_v1_f03.png"
+    ],
+    "guids": [
+      "8aa62336e03640ac962c86165eaec0b0",
+      "6eff0a910cf74eb69261e53b4f0e7e06",
+      "03f1df975bfe44d98e155b438a344c20",
+      "2edfce8e204a44dfa66eb70957abce59"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_airplane_v1_strip.png",
+    "strip_guid": "441b804e4bf24f858726dcf1d5ad95df",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_airplane_v1_preview.gif",
+    "gif_guid": "54014291c8e142149fc71ad5024d0811"
+  },
+  {
+    "name": "real_animated_tractor_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_tractor_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_tractor_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_tractor_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_tractor_v1_f03.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_tractor_v1_f04.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_tractor_v1_f05.png"
+    ],
+    "guids": [
+      "53e2b5f548ec4813a0ac77e47dbc21b9",
+      "84fa009e71e443c19e467d3e2ab7dc8e",
+      "57ce31f5defd44ea9a3a7c12f07c7152",
+      "0bd7222982ef4921bce2cc96143d0d69",
+      "17c77f1fba284d049e345883a11d763a",
+      "22be2aa344b342b48b5de6be24cb8183"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_tractor_v1_strip.png",
+    "strip_guid": "a1fae0c7a38640e0a13e36ef5168ea8b",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_tractor_v1_preview.gif",
+    "gif_guid": "2423b3a780784c5e85f144a10e1c00fd"
+  },
+  {
+    "name": "real_animated_boat_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_boat_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_boat_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_boat_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_boat_v1_f03.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_boat_v1_f04.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_boat_v1_f05.png"
+    ],
+    "guids": [
+      "2d3dd2e0118a4334986e37527b3b4dea",
+      "967e58535f064ea09f6d84aa0341ae86",
+      "f9b734bfef90478d8f5c623b6a653b3a",
+      "b9cd7dbf07924d5bb2f8adb4451e5e44",
+      "07c4490935ba4abe8267c7d13f64d243",
+      "f8bb9b2a4a594343b484518c6f06a01e"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_boat_v1_strip.png",
+    "strip_guid": "feac82c4c0f34390b777659dd125629d",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_boat_v1_preview.gif",
+    "gif_guid": "c3776117a97647adb9118a143285e203"
+  },
+  {
+    "name": "real_animated_flag_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_flag_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_flag_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_flag_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_flag_v1_f03.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_flag_v1_f04.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_flag_v1_f05.png"
+    ],
+    "guids": [
+      "e71a15b6299b4861a48e3e4eb3929f95",
+      "4c424c93f3224637bb4d6b83e0f621c8",
+      "9f5ff8c298d8466499eb131b56bb6c05",
+      "cea234c54b094acb953edb94ae637f88",
+      "73321d19699c45f5ba3cd6744540258b",
+      "e065c62c7fae47e799cd403cc983d270"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_flag_v1_strip.png",
+    "strip_guid": "2d9aaad0e7bf4246b6e3384a22f62a87",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_flag_v1_preview.gif",
+    "gif_guid": "cc8eb5e0beac4201a76358db0e3533ea"
+  },
+  {
+    "name": "real_animated_smoke_chimney_v1",
+    "frames": [
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_smoke_chimney_v1_f00.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_smoke_chimney_v1_f01.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_smoke_chimney_v1_f02.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_smoke_chimney_v1_f03.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_smoke_chimney_v1_f04.png",
+      "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_smoke_chimney_v1_f05.png"
+    ],
+    "guids": [
+      "85bbb55601fa441cad4418b57cda37a6",
+      "bac90c6c3f8c49e8872d52cc30e169d6",
+      "7786402456484fd0b8af889384e570b7",
+      "071852234c1245c985e3dbc7dd63cfed",
+      "ab882d8e3233461aaa933eec638ad35b",
+      "fd4d66e154764395a5feb257dbb7bf96"
+    ],
+    "strip": "Assets/SortingStation/Art/Cab/Scenery/Animated/real_animated_smoke_chimney_v1_strip.png",
+    "strip_guid": "0f08701cd1ae45ca82466dcb421218a9",
+    "gif": "Assets/SortingStation/Art/Cab/Scenery/Animated/Preview/real_animated_smoke_chimney_v1_preview.gif",
+    "gif_guid": "da596e602ca54d23b8b12bef1b9db007"
+  }
+]
